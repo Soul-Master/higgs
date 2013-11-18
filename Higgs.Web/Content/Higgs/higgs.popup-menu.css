@@ -1,0 +1,148 @@
+﻿
+.popup-menu
+{
+	position:absolute;
+	padding:2px;
+    border: 1px solid #a7abb0;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background: #fff;
+	z-index:5000;
+}
+.popup-menu .content
+{
+	position:relative;
+	z-index:5001;
+}
+.popup-menu .content.hover .hover
+{
+	display:block !important;
+}
+.popup-menu .item
+{
+	position:relative;
+	height:20px;
+	line-height:20px;
+	padding-top:3px;
+	padding-bottom:3px;
+	padding-left:32px;
+	padding-right:6px;
+	color:#4c4c4c;
+	z-index:5100;
+}
+.popup-menu .item .icon
+{
+	position:absolute;
+	top:3px;
+	left:3px;
+	width:20px;
+	height:20px;
+	z-index:5200;
+}
+.popup-menu .item .icon.selected
+{
+	background:url(higgs.popup-menu.png) -20px 0 no-repeat;
+}
+.popup-menu .item .icon div
+{
+	width:20px;
+	height:20px;
+	background:url(higgs.popup-menu.png) no-repeat;
+}
+.popup-menu .content .bg.hover
+{
+	top:1px;
+	left:1px;
+	right:1px;
+	height:24px;
+	width:auto;
+}
+.popup-menu .content .bg.hover .l
+{
+	width:8px;
+	background:url(higgs.popup-menu.png) no-repeat 0 -55px;
+}
+.popup-menu .content .bg.hover .c
+{
+	left:8px;
+	right:8px;    
+	background:url(higgs.popup-menu.png) repeat-x 0 -79px;
+}
+.popup-menu .content .bg.hover .r
+{
+	width:8px;
+	background:url(higgs.popup-menu.png) no-repeat -8px -55px;
+}
+.popup-menu .sep
+{
+	height: 1px;
+	margin-bottom: 1px;
+	margin-left:30px;
+	margin-right:3px;
+	border-bottom: 1px solid #c7c8c9;
+	color: #4c4c4c;
+	border-bottom-style: dashed;
+}
+.popup-menu .background .tl
+{
+	position:absolute;
+	top:0;
+	left:0;
+	width:3px;
+	height:3px;
+	background:url(higgs.popup-menu.png) no-repeat 0 -40px;
+}
+.popup-menu .background .tc
+{
+	top:0;
+	left:3px;
+	right:3px;
+	width:auto;
+	height:2px;
+	border-top:1px solid #a7abb0;
+	background:#fff;
+}
+.popup-menu .background .tr
+{
+	width:3px;
+	height:3px;
+	background:url(higgs.popup-menu.png) no-repeat -3px -40px;
+}
+.popup-menu .background .m
+{
+	top:3px;
+	bottom:3px;
+	left:0;
+	right:0;
+	border-left:1px solid #a7abb0;
+	border-right:1px solid #a7abb0;
+	background:#fff;
+}
+.popup-menu .background .l
+{
+    top: 2px;
+    bottom: 2px;
+    width: 27px;
+    border-right: 1px solid #e2e4e7;
+}
+.popup-menu .background .bl
+{
+	width:3px;
+	height:3px;
+	background:url(higgs.popup-menu.png) no-repeat 0 -43px;
+}
+.popup-menu .background .bc
+{
+	left:3px;
+	right:3px;
+	height:2px;
+	border-bottom:1px solid #a7abb0;
+	background:#fff;
+}
+.popup-menu .background .br
+{
+	width:3px;
+	height:3px;
+	background:url(higgs.popup-menu.png) no-repeat -3px -43px;
+}
