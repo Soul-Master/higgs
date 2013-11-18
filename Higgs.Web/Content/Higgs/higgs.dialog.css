@@ -1,0 +1,256 @@
+﻿
+.higgs-dialog
+{
+    position:fixed;
+    top:50%;
+    left:50%;
+    margin-left:-100px;
+    margin-top:-50px;
+    color: #000;
+    cursor: default;
+    z-index:10000;
+}
+.higgs-dialog-bg
+{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#000;
+    z-index:9000;
+}
+.higgs-dialog .border.top
+{
+    height:27px;
+}
+.higgs-dialog .border.top.l
+{
+    width:6px;
+    background: url(higgs.dialog.png) 0 0 no-repeat;
+}
+.higgs-dialog .border.top.m
+{
+    left:6px;
+    right:6px;
+    background: url(higgs.dialog.png) 0 -27px repeat-x;
+}
+.higgs-dialog .border.top.r
+{
+    width: 6px;
+    background: url(higgs.dialog.png) -6px 0 no-repeat;
+}
+.higgs-dialog .border.middle
+{
+    top:27px;
+    bottom:6px;
+    width:4px;
+    border: 1px solid #777792;   
+    border-top:0;
+    border-bottom:0;
+    background: #fff;
+}
+.higgs-dialog .border.middle div
+{
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:1px;
+    right:1px;
+    width:2px;
+    background:#c4cbe1;
+}
+.higgs-dialog .border.bottom
+{
+    top:auto;
+    bottom: 0;
+    height:6px;
+}
+.higgs-dialog .border.bottom.l
+{
+    width:6px;
+    background: url(higgs.dialog.png) -12px 0 no-repeat;
+}
+.higgs-dialog .border.bottom.m
+{
+    left:6px;
+    right:6px;
+    background: url(higgs.dialog.png) 0 -54px repeat-x;
+}
+.higgs-dialog .border.bottom.r
+{
+    width:6px;
+    background: url(higgs.dialog.png) -18px 0 no-repeat;
+}
+.higgs-dialog .header
+{
+    position:relative;
+    height:27px;
+    line-height: 27px;
+    color:#505860;
+    z-index: 10001;
+}
+.higgs-dialog .header h4
+{
+    padding-right: 40px;
+    margin-left: 12px;
+    margin-right: 24px;
+    font-size: 14px;
+}
+.higgs-dialog .header .button
+{
+    position:absolute;
+    top:3px;
+    right:5px;
+    display:block;
+    width:22px;
+    height:22px;
+    cursor:default;
+}
+.higgs-dialog .header .button.hover
+{
+    background:url(higgs.dialog.png) 0 -60px no-repeat;
+}
+.higgs-dialog .header .button.active
+{
+    background:url(higgs.dialog.png) -22px -60px no-repeat;
+}
+.higgs-dialog .header .button span
+{
+    display:block;
+    margin-top: 7px;
+    margin-left: 5px;
+    margin-right: 6px;
+}
+.higgs-dialog .header .button.close span
+{
+    width:11px;
+    height:9px;
+    border:0;
+    background:url(higgs.dialog.png) -12px -6px no-repeat;
+}
+.higgs-dialog .content
+{
+    position: relative;
+    display:none;
+    margin: 6px;
+    border-top: 1px solid #777792;
+    background:#fff;
+    overflow: auto;
+}
+.higgs-dialog .content legend
+{
+    height: 40px;
+    margin: 0 !important;
+    color: #003399;
+    line-height: 40px;
+    font-size: 17px;
+    white-space: nowrap;
+}
+/* IE7-only style */
+*:first-child+html .higgs-dialog .content legend
+{
+    left: -7px;
+}
+.higgs-dialog .content > p
+{
+    margin: 15px;
+}
+.higgs-dialog .splash-screen
+{
+    margin-bottom:6px;
+    margin-left:6px;
+    margin-right:6px;
+    padding:10px;
+    border-top: 1px solid #777792;
+    background:#fff;
+    text-align: center;
+}
+.higgs-dialog .splash-screen img
+{
+    margin:15px;
+}
+.higgs-dialog .command-bar
+{
+    position: relative;
+    padding:10px;
+    border-top:1px solid #c1c1c1;
+    background:#eee;
+}
+.higgs-dialog fieldset
+{
+    position: static !important;
+    padding: 15px;
+    padding-top: 0;
+}
+.higgs-dialog fieldset p
+{    
+    clear: both;
+    height: auto;
+    line-height: 22px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.higgs-dialog fieldset label
+{
+    display: inline-block;
+	width:150px;
+    height: 22px;
+	padding:0;
+	line-height:22px;
+}
+.higgs-dialog fieldset .textbox
+{
+	width: 239px;
+}
+.higgs-dialog fieldset .textbox.small
+{
+    width: 58px;
+    margin-right: 5px;
+}
+.higgs-dialog fieldset .textbox.large
+{
+    width: 162px;
+}
+.higgs-dialog fieldset select
+{
+	width: 244px;
+}
+.higgs-dialog fieldset select.small
+{
+    width: 122px;
+    margin-right: 5px;
+}
+.higgs-dialog fieldset p.checkbox
+{
+    margin-left: 117px;
+    margin-right: 5px;
+}
+.higgs-dialog .saving-indicator
+{
+    position: absolute;
+    top: 27px;
+    left: 7px;
+    right: 7px;
+    width: auto;
+    height: 15px;
+    overflow: hidden;
+    z-index: 10000;
+}
+.higgs-dialog .saving-indicator div
+{
+    position: absolute;
+    top: 0;
+    left: -200px;
+    right: 0;
+    width: auto;
+    height: 15px;
+    overflow: hidden;
+}
+.higgs-dialog .saving-indicator div span
+{
+    display: block;
+    width:200px;
+    height:15px;
+    background: url(higgs.dialog.loading-indicator.png) no-repeat;
+}
