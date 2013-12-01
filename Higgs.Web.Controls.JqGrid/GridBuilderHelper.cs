@@ -297,7 +297,7 @@ namespace Higgs.Web.Controls.JqGrid
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="multiSelect">Boolean indicating if multiselect is enabled</param>
-        public static GridBuilder MultiSelect(this GridBuilder builder, bool multiSelect)
+        public static GridBuilder MultiSelect(this GridBuilder builder, bool multiSelect = true)
         {
             builder.CurrentGrid.MultiSelect =multiSelect;
             return builder;
@@ -308,7 +308,7 @@ namespace Higgs.Web.Controls.JqGrid
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="multiSelectWidth"></param>
-        public static GridBuilder MultiSelectWidth(this GridBuilder builder, int multiSelectWidth)
+        public static GridBuilder MultiSelectWidth(this GridBuilder builder, int multiSelectWidth = 20)
         {
             builder.CurrentGrid.MultiSelectWidth =multiSelectWidth;
             return builder;
