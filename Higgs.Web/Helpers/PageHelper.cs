@@ -149,6 +149,7 @@ namespace Higgs.Web.Helpers
             {
                 path = "~/";
             }   
+            
             return path[0] == '~' ? VirtualPathUtility.ToAbsolute(path, helper.ViewContext.RequestContext.HttpContext.Request.ApplicationPath) : path;
         }
 
@@ -202,6 +203,13 @@ namespace Higgs.Web.Helpers
         public static MvcHtmlString JavaScript(this HtmlHelper helper, string javaScript)
         {
             return helper.JavaScript(null, javaScript);
+        }
+
+        public static MvcHtmlString StaticHtml(this HtmlHelper helper, string path)
+        {
+            path = helper.ViewContext.HttpContext.Server.MapPath(path);
+
+            return new MvcHtmlString(File.ReadAllText(path));
         }
     }
 }
