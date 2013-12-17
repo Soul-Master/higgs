@@ -7,13 +7,14 @@ using NPOI.HSSF.UserModel;
 using System.Linq;
 using System.Data;
 using NPOI.SS.UserModel;
+using System.Collections;
 
 namespace Higgs.Web.Controls.JqGrid
 {
     public static class ExcelHelper
     {
         // TODO: Move to OOXML
-        public static void Export<T>(this IEnumerable<T> data, Stream stream, List<ExportColumnModel> colModel)
+        public static void Export(this IEnumerable data, Stream stream, List<ExportColumnModel> colModel)
         {
             var workbook = new HSSFWorkbook();
 

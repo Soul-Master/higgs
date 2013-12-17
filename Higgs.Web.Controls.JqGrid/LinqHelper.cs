@@ -85,30 +85,36 @@ namespace Higgs.Web.Controls.JqGrid
             );
         }
 
-        public static ActionResult ExportAsExcel<T>(this IEnumerable<T> data, List<ExportColumnModel> colModel = null)
+        public static ActionResult ExportAsExcel(this IEnumerable data, List<ExportColumnModel> colModel = null)
         {
-            var type = typeof(T);
+            var tempColModel = new List<ExportColumnModel>();
 
-            if (colModel == null)
+            if (data != null)
             {
-                colModel = new List<ExportColumnModel>();
-
-                foreach (var p in type.GetProperties())
+                foreach (var obj in data)
                 {
-                    if (!p.CanRead) continue;
+                    tempColModel.AddRange
+                    (
+                        from p in obj.GetType().GetProperties()
+                        where p.CanRead
+                        select new ExportColumnModel
+                        {
+                            Name = p.Name,
+                            Title = p.Name
+                        }
+                    );
 
-                    colModel.Add(new ExportColumnModel
-                    {
-                        Name = p.Name,
-                        Title = p.Name
-                    });
-                } 
+                    break;
+                }
+            }
+
+            if (colModel != null)
+            {
+                colModel.RemoveAll(x => tempColModel.All(y => y.Name != x.Name));
             }
             else
             {
-                var properties = type.GetProperties().Where(x => x.CanRead).Select(x => x.Name);
-
-                colModel.RemoveAll(x => !properties.Contains(x.Name));
+                colModel = tempColModel;
             }
 
             var stream = new MemoryStream();
@@ -174,9 +180,10 @@ namespace Higgs.Web.Controls.JqGrid
             {
                 var temp = data.FilterBy(request, out totalFilteredRow).ToList();
 
-                if (request.IsExport) return ExportAsExcel(temp, request.ColumnModel);
                 filteredData = temp;
             }
+
+            if (request.IsExport) return ExportAsExcel(filteredData, request.ColumnModel);
             
             return new JsonResult
             {
