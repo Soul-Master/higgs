@@ -30,6 +30,7 @@ namespace Higgs.Web.Controls.JqGrid
         #region Export data
 
         public List<ExportColumnModel> ColumnModel { get; set; }
+        public string ExportFileName { get; set; }
 
         #endregion
     }
