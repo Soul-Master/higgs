@@ -347,9 +347,8 @@
             ({
                 url: noCacheUrl(getUrl(x.options.content)),
                 data: x.options.urlData,
-                type: x.options.httpMethod,
                 dataType: 'html',
-                method: 'GET',
+                method: x.options.httpMethod,
                 success: function (html)
                 {
                     x.displayContent(html);

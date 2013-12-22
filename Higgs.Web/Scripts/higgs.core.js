@@ -424,6 +424,21 @@ if (!Array.prototype.map)
     };
 }
 
+if (!Array.prototype.forEach)
+{
+    Array.prototype.forEach = function (fn, scope)
+    {
+        var i, len;
+        for (i = 0, len = this.length; i < len; ++i)
+        {
+            if (i in this)
+            {
+                fn.call(scope, this[i], i, this);
+            }
+        }
+    };
+}
+
 //#endregion
 
 //#region Function Helpers
@@ -904,7 +919,10 @@ $.fn.value = function (value)
         }
         else
         {
+            var markText = x.data('watermark');
             value = x.val();
+
+            if (value === markText) value = '';
         }
 
         return value;
@@ -1257,8 +1275,10 @@ $.fn.waterMark = function (markText, displayControl)
 
     var y = (displayControl) ? $(displayControl) : undefined;
     var form = x.parents('form');
-    var onBlur = function (x, y)
+    var onBlur = function ()
     {
+        if (x.is(':focus')) return;
+
         var value = x.value();
 
         if (!value || value === markText)
@@ -1280,7 +1300,7 @@ $.fn.waterMark = function (markText, displayControl)
         }
         else
         {
-            x.removeClass('hidden');
+            x.removeClass('hidden watermark');
 
             if (y)
             {
@@ -1289,24 +1309,19 @@ $.fn.waterMark = function (markText, displayControl)
         }
     };
 
-    x.delayFireEvent('blur', 100, function ()
-    {
-        onBlur(x, y);
-    })
-    .focus(function ()
+    x.on('blur', onBlur);
+    x.on('change', onBlur);
+    x.on('focus', function()
     {
         if (x.val() === markText)
         {
             if (y)
             {
-                y
-                    .removeClass('watermark')
+                y.removeClass('watermark')
                     .val('');
-            }
-            else
+            } else
             {
-                x
-                    .removeClass('watermark')
+                x.removeClass('watermark')
                     .val('');
             }
         }
@@ -1338,7 +1353,7 @@ $.fn.waterMark = function (markText, displayControl)
             y.attr('tabindex', x.attr('tabindex'));
         }
     }
-    onBlur(x, y);
+    onBlur();
     form
         .on('prepareSubmit', function ()
         {

@@ -154,7 +154,7 @@ namespace Higgs.Web.Controls.JqGrid
                 request.PageSize = int.MaxValue;
             }
 
-            if(totalRows == 0)
+            if (totalRows == 0 && !request.IsExport)
             {
                 return new JsonResult
                 {
