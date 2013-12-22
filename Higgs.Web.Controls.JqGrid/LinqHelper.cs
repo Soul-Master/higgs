@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using Higgs.Web.Controls.JqGrid.Models;
@@ -85,7 +86,7 @@ namespace Higgs.Web.Controls.JqGrid
             );
         }
 
-        public static ActionResult ExportAsExcel(this IEnumerable data, List<ExportColumnModel> colModel = null)
+        public static ActionResult ExportAsExcel(this IEnumerable data, string fileName = null, List<ExportColumnModel> colModel = null)
         {
             var tempColModel = new List<ExportColumnModel>();
 
@@ -123,7 +124,7 @@ namespace Higgs.Web.Controls.JqGrid
 
             return new StreamResult(stream, "application/ms-excel")
             {
-                FileDownloadName = (MvcHelper.GetCurrentActionGroupName() ?? "Export") + "Data.xls"
+                FileDownloadName = string.IsNullOrEmpty(fileName) ? (MvcHelper.GetCurrentActionGroupName() ?? "Export") + "Data.xls" : fileName + ".xls"
             };
         }
         
@@ -183,7 +184,7 @@ namespace Higgs.Web.Controls.JqGrid
                 filteredData = temp;
             }
 
-            if (request.IsExport) return ExportAsExcel(filteredData, request.ColumnModel);
+            if (request.IsExport) return filteredData.ExportAsExcel(request.ExportFileName, request.ColumnModel);
             
             return new JsonResult
             {
