@@ -150,3 +150,9 @@ $RECYCLE.BIN/
 # Mac crap
 .DS_Store
 /packages
+
+/_Nuget.Higgs/Packages/*.nupkg
+
+/_Nuget.Higgs/Packages/Higgs.Web.Controls.JqGrid.Core/lib/net40/Higgs.Web.Controls.JqGrid.dll
+
+/_Nuget.Higgs/Packages/Higgs/lib/net40/Higgs.Core.dll
