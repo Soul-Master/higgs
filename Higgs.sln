@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Nuget.Higgs", "_Nuget.Higg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Higgs.NuGet", "_Nuget.Higgs\Higgs.NuGet.csproj", "{5327C6C1-BCCB-4BF3-80DA-15E343234E1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Higgs.Web.Scripts", "Higgs.Web.Scripts\Higgs.Web.Scripts.csproj", "{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -118,6 +120,24 @@ Global
 		{5327C6C1-BCCB-4BF3-80DA-15E343234E1B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{5327C6C1-BCCB-4BF3-80DA-15E343234E1B}.Release|Win32.ActiveCfg = Release|Any CPU
 		{5327C6C1-BCCB-4BF3-80DA-15E343234E1B}.Release|x86.ActiveCfg = Release|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Deploy|Any CPU.ActiveCfg = Debug|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Deploy|Any CPU.Build.0 = Debug|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Deploy|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Deploy|Mixed Platforms.Build.0 = Debug|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Deploy|Win32.ActiveCfg = Debug|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Deploy|x86.ActiveCfg = Debug|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Release|Win32.ActiveCfg = Release|Any CPU
+		{36CEDFEF-477D-47CD-86EF-D5479CA63FEB}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

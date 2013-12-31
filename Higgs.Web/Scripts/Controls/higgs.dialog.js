@@ -49,7 +49,7 @@
             title = undefined;
         }
 
-        if (typeof $speed === 'undefined') window.$speed = 400;
+        if (typeof $speed === 'undefined') window.$speed = 250;
         if (content instanceof $ || typeof content === 'string')
         {
             options = options || {};
@@ -345,7 +345,7 @@
 
             $.ajax
             ({
-                url: noCacheUrl(getUrl(x.options.content)),
+                url: higgs.getUrl(x.options.content, true),
                 data: x.options.urlData,
                 dataType: 'html',
                 method: x.options.httpMethod,
