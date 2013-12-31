@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Higgs.NuGet</RootNamespace>
     <AssemblyName>Higgs.NuGet</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
@@ -26,6 +26,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -36,6 +37,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -45,6 +47,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -84,10 +87,6 @@
     <ProjectReference Include="..\Higgs.Core\Higgs.Core.csproj">
       <Project>{8f16b6a5-c40b-4e67-a8eb-8702e3786ac4}</Project>
       <Name>Higgs.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Higgs.StructureMap\Higgs.StructureMap.csproj">
-      <Project>{61f70fb2-a394-4fe0-ae99-f01b25aa8079}</Project>
-      <Name>Higgs.StructureMap</Name>
     </ProjectReference>
     <ProjectReference Include="..\Higgs.Web.Controls.JqGrid\Higgs.Web.Controls.JqGrid.csproj">
       <Project>{7a8e0d58-b8c9-478c-84d6-f6460a3d08a0}</Project>
@@ -141,6 +140,7 @@
     <Content Include="..\Higgs.Web\Scripts\higgs.validation.rules.js">
       <Link>Packages\Higgs.Web\content\Scripts\Higgs\higgs.validation.rules.js</Link>
     </Content>
+    <None Include="app.config" />
     <None Include="NuGet.targets">
       <SubType>Designer</SubType>
     </None>
