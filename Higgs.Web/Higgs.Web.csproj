@@ -206,7 +206,6 @@
     <Compile Include="Controls\Ribbon\Ribbon.cs" />
     <Compile Include="HiggsScriptManager.cs" />
     <None Include="Content\Higgs\higgs.popup-menu.psd" />
-    <None Include="ModelSerializer.cs.todo" />
     <Compile Include="ViewHierarchy.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -288,6 +287,7 @@
     <Content Include="Scripts\higgs.validation.js" />
     <Content Include="Scripts\higgs.validation.messages.js" />
     <Content Include="Scripts\higgs.validation.rules.js" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
