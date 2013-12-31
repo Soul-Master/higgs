@@ -120,47 +120,57 @@ function preLoad(src)
 }
 
 // Original code at http://www.filamentgroup.com/lab/jquery_plugin_for_requesting_ajax_like_file_downloads/
-$.sendData = function (url, data, method)
+$.sendData = function (url, data, method, isNewWindow)
 {
-    //url and data options required
-    if (url)
+    if (isNewWindow === undefined) isNewWindow = true;
+
+    if (url.indexOf('~/') === 0) url = getUrl(url);
+    var form = $('<form />');
+    form.attr('id', 'form' + (new Date()).getTime());
+    form.attr('action', url);
+    form.attr('method', method || 'post');
+
+    if (isNewWindow)
     {
-        if (url.indexOf('~/') === 0) url = getUrl(url);
-        var form = $('<form action="' + url + '" method="' + (method || 'post') + '"></form>');
+        form.attr('target', '_blank');
+    }
 
-        if (data)
+    if (data)
+    {
+        if (typeof data == 'string')
         {
-            if (typeof data == 'string')
+            //split params into form inputs
+            $.each(data.split('&'), function ()
             {
-                //split params into form inputs
-                $.each(data.split('&'), function ()
-                {
-                    var pair = this.split('=');
-                    $('<input type="hidden" />').attr
-                    ({
-                        name: pair[0],
-                        value: pair[1]
-                    }).appendTo(form);
-                });
-            }
-            else
-            {
-                $.each(data, function (key, value)
-                {
-                    $('<input />').attr
-                    ({
-                        type: 'hidden',
-                        name: key,
-                        value: value + ''
-                    }).appendTo(form);
-                });
-            }
+                var pair = this.split('=');
+                $('<input type="hidden" />').attr
+                ({
+                    name: pair[0],
+                    value: pair[1]
+                }).appendTo(form);
+            });
         }
+        else
+        {
+            $.each(data, function (key, value)
+            {
+                $('<input />').attr
+                ({
+                    type: 'hidden',
+                    name: key,
+                    value: value + ''
+                }).appendTo(form);
+            });
+        }
+    }
 
-        //send request
-        form.appendTo('body').submit();
+    //send request
+    form.appendTo('body').submit();
+
+    if (!isNewWindow)
+    {
         form.remove();
-    };
+    }
 };
 
 //#endregion

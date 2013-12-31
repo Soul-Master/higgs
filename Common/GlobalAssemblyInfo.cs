@@ -38,7 +38,7 @@ using System.Security;
  *          Build Number = amount of normal building solution
 */
 #endregion
-[assembly: AssemblyVersion("2.0.1.0")]
+[assembly: AssemblyVersion("2.0.3.0")]
 
 #region Assembly Informational Version
 /*
@@ -68,4 +68,4 @@ using System.Security;
  * 
 */
 #endregion
-[assembly: AssemblyInformationalVersion("2.0 Beta 2")]
+[assembly: AssemblyInformationalVersion("2.0 RTM")]

@@ -10,7 +10,7 @@
 *
 * Copyright@2011 by Soul_Master
 * License: Microsoft Public License
-* http://higgs.codeplex.com/
+* https://github.com/Soul-Master/higgs/
 */
 (function ($, undef)
 {
