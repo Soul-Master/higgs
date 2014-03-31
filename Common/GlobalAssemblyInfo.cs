@@ -7,7 +7,7 @@ using System.Security;
 [assembly: AssemblyCompany("Soul_Master")]
 [assembly: AssemblyCopyright("Copyright \x00a9 2014, Soul_Master. All rights reserved.")]
 [assembly: ComVisible(false)]
-[assembly: AllowPartiallyTrustedCallers]
+//[assembly: AllowPartiallyTrustedCallers]
 
 #region Assembly Version
 /*
