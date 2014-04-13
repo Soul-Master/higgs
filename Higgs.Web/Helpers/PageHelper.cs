@@ -57,7 +57,7 @@ namespace Higgs.Web.Helpers
             return new MvcHtmlString
             (
                 "<script type=\"text/javascript\">" +
-                "Higgs.setBaseUrl('" + helper.ViewContext.HttpContext.Request.GetApplicationUrl() + "');" +
+                "$.baseUrl('" + helper.ViewContext.HttpContext.Request.GetApplicationUrl() + "');" +
                 "</script>"
             );
         }
