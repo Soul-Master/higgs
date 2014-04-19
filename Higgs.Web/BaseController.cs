@@ -27,7 +27,7 @@ namespace Higgs.Web
                 {
                     var result2 = new HiggsResult
                     {
-                        IsComplete = false
+                        IsSuccess = false
                     };
 
                     var result = result2;
@@ -47,7 +47,7 @@ namespace Higgs.Web
                     return result;
                 }
 
-                return new HiggsResult { IsComplete = true };
+                return new HiggsResult { IsSuccess = true };
             }
         }
     }

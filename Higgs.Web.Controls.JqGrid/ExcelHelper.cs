@@ -151,7 +151,7 @@ namespace Higgs.Web.Controls.JqGrid
 
             if (_numericTypes.Contains(colType))
             {
-                cell.SetCellType(CellType.NUMERIC);
+                cell.SetCellType(CellType.Numeric);
                 cell.SetCellValue(Convert.ToDouble(cellValue));
             }
             else if (_stringConvertableTypes.Contains(colType))
@@ -166,7 +166,7 @@ namespace Higgs.Web.Controls.JqGrid
 
                 cell.SetCellValue(((DateTime)cellValue).ToString(dateFormat));
                 style.DataFormat = format.GetFormat(dateFormat);
-                cell.SetCellType(CellType.STRING);
+                cell.SetCellType(CellType.String);
                 cell.CellStyle = style;
             }
             else

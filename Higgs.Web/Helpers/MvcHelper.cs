@@ -111,7 +111,7 @@ namespace Higgs.Web.Helpers
             }
 
             result.ErrorList["custom-error"].Add(errorMessage);
-            result.IsComplete = false;
+            result.IsSuccess = false;
 
             return result;
         }
@@ -124,7 +124,7 @@ namespace Higgs.Web.Helpers
             }
 
             result.ErrorList[key].Add(errorMessage);
-            result.IsComplete = false;
+            result.IsSuccess = false;
 
             return result;
         }
