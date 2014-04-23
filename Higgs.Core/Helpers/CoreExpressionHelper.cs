@@ -27,6 +27,20 @@ namespace Higgs.Core.Helpers
                     yield return me.Member;
                 }
             }
+            else if (expression.Body is UnaryExpression)
+            {
+                var unary = (UnaryExpression)expression.Body;
+                var me = unary.Operand as MemberExpression;
+
+                if (me != null)
+                {
+                    yield return me.Member;
+                }
+                else
+                {
+                    throw new Exception(Resources.InvalidExpressionForGetMemberInfoes);
+                }
+            }
             else
             {
                 throw new Exception(Resources.InvalidExpressionForGetMemberInfoes);
