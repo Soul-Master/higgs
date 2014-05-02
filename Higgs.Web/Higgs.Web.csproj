@@ -127,16 +127,10 @@
     <Compile Include="..\Common\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AccessControl.cs" />
-    <Compile Include="AccessType.cs" />
-    <Compile Include="ActionInfo.cs" />
-    <Compile Include="ActionTypePattern.cs" />
-    <Compile Include="Attributes\AuthenticatedAttribute.cs" />
     <Compile Include="Attributes\CachedResult.cs" />
     <Compile Include="Attributes\CustomErrorAttribute.cs" />
     <Compile Include="Attributes\EnableAjaxHistoryAttribute.cs" />
     <Compile Include="Attributes\LocalOnlyAttribute.cs" />
-    <Compile Include="Attributes\MapRouteAttribute.cs" />
     <Compile Include="Attributes\NoCacheAttribute.cs" />
     <Compile Include="Attributes\RequireAllParameterAttribute.cs" />
     <Compile Include="Attributes\WaitAttribute.cs" />
@@ -145,24 +139,6 @@
     <Compile Include="BooleanModelBinder.cs" />
     <Compile Include="JsonNetResult.cs" />
     <Compile Include="CombinedFileInfo.cs" />
-    <Compile Include="Configurations\ExcludeFolderCollection.cs" />
-    <Compile Include="Configurations\ExcludeFolderElement.cs" />
-    <Compile Include="Configurations\ValidationSection.cs" />
-    <Compile Include="Configurations\HiggsWebConfigSection.cs" />
-    <Compile Include="Configurations\IgnorePathElement.cs" />
-    <Compile Include="Configurations\IgnorePathElementsCollection.cs" />
-    <Compile Include="Configurations\RoutingSection.cs" />
-    <Compile Include="Configurations\StaticViewSection.cs" />
-    <Compile Include="Controls\ControlBaseHelper.cs" />
-    <Compile Include="Controls\HiggsLabelHelper.cs" />
-    <Compile Include="Controls\InputControlBaseHelper.cs" />
-    <Compile Include="Controls\HiggsForm.cs" />
-    <Compile Include="Controls\BuilderBase.cs" />
-    <Compile Include="Controls\HiggsButton.cs" />
-    <Compile Include="Controls\HiggsHiddenField.cs" />
-    <Compile Include="Controls\ControlHelper.cs" />
-    <Compile Include="Controls\Ribbon\RibbonAppMenu.cs" />
-    <Compile Include="Controls\Ribbon\RibbonAppMenuBuilder.cs" />
     <Compile Include="CustomHttpStatusCode.cs" />
     <Compile Include="CombinedFileType.cs" />
     <Compile Include="EmptyTempDataProvider.cs" />
@@ -175,42 +151,13 @@
     <Compile Include="Helpers\MvcHelper.cs" />
     <Compile Include="Helpers\ResourceHelper.cs" />
     <Compile Include="HiggsResult.cs" />
-    <Compile Include="HtmlHelperExtension.cs" />
     <Compile Include="IBaseStaticFileController.cs" />
     <Compile Include="LazyCache.cs" />
     <Compile Include="LazyList.cs" />
     <Compile Include="ResourceInfo.cs" />
-    <Compile Include="MvcApplication.cs" />
-    <Compile Include="NamePattern.cs" />
     <Compile Include="StreamResult.cs" />
     <Compile Include="TransferResult.cs" />
     <Compile Include="Utils\ConfigUtils.cs" />
-    <Compile Include="Controls\ControlBase.cs" />
-    <Compile Include="Controls\InputControlBase.cs" />
-    <Compile Include="Controls\HiggsRadioButton.cs" />
-    <Compile Include="Controls\HiggsTextArea.cs" />
-    <Compile Include="Controls\HiggsCheckBox.cs" />
-    <Compile Include="Controls\HiggsDropDownList.cs" />
-    <Compile Include="Controls\HiggsLabel.cs" />
-    <Compile Include="Controls\IClickableControl.cs" />
-    <Compile Include="Controls\MSAjax\CalendarHelper.cs" />
-    <Compile Include="Controls\Ribbon\RibbonSmallButton.cs" />
-    <Compile Include="Controls\Ribbon\RibbonButtonBuilder.cs" />
-    <Compile Include="Controls\Ribbon\RibbonBaseButton.cs" />
-    <Compile Include="Controls\Ribbon\RibbonBaseControl.cs" />
-    <Compile Include="Controls\Ribbon\RibbonBigButton.cs" />
-    <Compile Include="Controls\Ribbon\RibbonBuilder.cs" />
-    <Compile Include="Controls\Ribbon\RibbonGroupBuilder.cs" />
-    <Compile Include="Controls\Ribbon\RibbonGroup.cs" />
-    <Compile Include="Controls\Ribbon\RibbonTab.cs" />
-    <Compile Include="Controls\Ribbon\RibbonTabBuilder.cs" />
-    <Compile Include="Controls\HiggsTextBox.cs" />
-    <Compile Include="Controls\HtmlBuilder.cs" />
-    <Compile Include="Controls\PopUpMenu.cs" />
-    <Compile Include="Controls\PopUpMenuItem.cs" />
-    <Compile Include="Controls\Ribbon\Ribbon.cs" />
-    <Compile Include="HiggsScriptManager.cs" />
-    <None Include="Content\Higgs\higgs.popup-menu.psd" />
     <Compile Include="ViewHierarchy.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -224,7 +171,6 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Scripts\jquery-2.1.0.min.map" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -265,35 +211,6 @@
       <Project>{8F16B6A5-C40B-4E67-A8EB-8702E3786AC4}</Project>
       <Name>Higgs.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Scripts\jquery-2.1.0.intellisense.js" />
-    <Content Include="Scripts\jquery-2.1.0.js" />
-    <Content Include="Scripts\jquery-2.1.0.min.js" />
-    <None Include="Content\Higgs\higgs.control.base.css" />
-    <None Include="Content\Higgs\higgs.dialog.css" />
-    <None Include="Content\Higgs\higgs.dialog.loading-indicator.png" />
-    <None Include="Content\Higgs\higgs.dialog.png" />
-    <None Include="Content\Higgs\higgs.dialog.progressbar.gif" />
-    <None Include="Content\Higgs\higgs.popup-menu.css" />
-    <None Include="Content\Higgs\higgs.popup-menu.png" />
-    <Content Include="Content\Higgs\higgs.dialog-lite.png" />
-    <Content Include="Content\Higgs\higgs.dialog.lite.css" />
-    <Content Include="Scripts-Unpublished\Controls\higgs.autocomplete-selectlist.js" />
-    <Content Include="Scripts-Unpublished\Controls\higgs.controls.accordion.js" />
-    <Content Include="Scripts\Controls\higgs.controls.jqgrid.js" />
-    <Content Include="Scripts-Unpublished\Controls\higgs.controls.popup-menu.js" />
-    <Content Include="Scripts\Controls\higgs.dialog.js" />
-    <Content Include="Scripts-Unpublished\higgs.animation.js" />
-    <Content Include="Scripts\higgs.core.js" />
-    <Content Include="Scripts\higgs.core.log.js" />
-    <Content Include="Scripts-Unpublished\higgs.notification.js" />
-    <Content Include="Scripts\higgs.validation.js" />
-    <Content Include="Scripts\higgs.validation.messages.js" />
-    <Content Include="Scripts\higgs.validation.rules.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

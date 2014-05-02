@@ -26,39 +26,6 @@ namespace Higgs.Web.Helpers
 
             return routeData != null ? routeData.Values["action"].ToString() : null;
         }
-        
-        /// <summary>
-        /// Use to get current action name by library outside MVC context.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetCurrentActionGroupName()
-        {
-            var actionName = GetCurrentActionName();
-
-            if(actionName == null) return null;
-
-            return AccessControl.GetActionInfo(actionName).ActionGroupName;
-        }
-
-        public static bool IsAuthorized<TController>(Expression<Func<TController, object>> routeExpression)
-            where TController : IController
-        {
-            string controllerName, actionName;
-            routeExpression.GetLogicalPath(out controllerName, out actionName);
-
-            return IsAuthorized(controllerName, actionName);
-        }
-
-        public static bool IsAuthorized(string controllerName, string actionName)
-        {
-            var att = new AuthenticatedAttribute
-            {
-                ControllerName = controllerName,
-                ActionName = actionName
-            };
-            
-            return att.IsAuthorized();
-        }
 
         public static void AddError<TModel>(this ModelStateDictionary modelStateDic, Expression<Func<TModel, object>> selectedPropertyExpression, string errorMessage)
         {
