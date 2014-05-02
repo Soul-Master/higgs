@@ -5,8 +5,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
-using Higgs.Web.Attributes;
-using Higgs.Web.Configurations;
 
 namespace Higgs.Web.Helpers
 {
@@ -23,7 +21,6 @@ namespace Higgs.Web.Helpers
         public static string GetLogicalPath<TController>(this Expression<Func<TController, object>> routeExpression, out string controllerName, out string actionName)
             where TController : IController
         {
-            var config = HiggsWebConfigSection.Current;
             var part = routeExpression.Body;
 
             if (part.NodeType == ExpressionType.Call)
@@ -35,33 +32,10 @@ namespace Higgs.Web.Helpers
                 controllerName = typeof(TController).Name.Replace("Controller", "");
                 actionName = actionMethod.Name;
 
-                var mapRoutes= actionMethod.GetCustomAttributes(typeof (MapRouteAttribute), true) as MapRouteAttribute[];
-                
-                if(mapRoutes != null && mapRoutes.Length > 0)
-                {
-                    foreach(var x in mapRoutes)
-                    {
-                        result = x.RouteUrl.Replace("~/", "~/{controller}/{action}/");
+                result += "{controller}/{action}/{id}";
 
-                        if(EvalRouteUrl(ref result, callExpression))
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    if (config != null && config.Routing != null && !string.IsNullOrEmpty(config.Routing.DefaultRoute))
-                    {
-                        result += config.Routing.DefaultRoute;
-                    }
-                    else
-                    {
-                        result += "{controller}/{action}/{id}";
-                    }
-                    EvalRouteUrl(ref result, callExpression);
-                }
-                
+                EvalRouteUrl(ref result, callExpression);
+
                 return result;
             }
             
