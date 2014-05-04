@@ -63,7 +63,7 @@ namespace Higgs.Core
             return derivedObj;
         }
 
-        public static int UpdateModel<TModel>(this TModel oldData, TModel changedData, IEnumerable changedProperties = null)
+        public static int UpdateModel(this object oldData, object changedData, IEnumerable changedProperties = null)
         {
             var changedPropertyList = new List<string>();
             var count = 0;
@@ -74,24 +74,27 @@ namespace Higgs.Core
                                              select propertyName.ToString());
             }
 
-            foreach (var pi in typeof(TModel).GetProperties()
+            var oldType = oldData.GetType();
+            var changedType = changedData.GetType();
+
+            foreach (var pi in changedType.GetProperties()
                 .Where
                 (
                     x => x.Name.ToUpper() != "ID" &&
-                         x.CanRead && 
-                         x.CanWrite && 
+                         x.CanRead &&
+                         x.CanWrite &&
                          (changedProperties == null || changedPropertyList.Contains(x.Name)) &&
                         x.PropertyType.FullName.StartsWith("System") &&
                         !x.PropertyType.FullName.StartsWith("System.Collection") &&
                         !x.PropertyType.FullName.StartsWith("System.Data.Entity.DynamicProxies")
                 ))
             {
-                var oldValue = pi.GetValue(oldData, null);
                 var newValue = pi.GetValue(changedData, null);
+                var oldProp = oldType.GetProperty(pi.Name);
 
-                if ((oldValue != null || newValue == null) && (oldValue == null || oldValue.Equals(newValue))) continue;
+                if (oldProp == null || !oldProp.CanWrite) continue;
 
-                pi.SetValue(oldData, newValue, null);
+                oldProp.SetValue(oldData, newValue, null);
                 count++;
             }
 
