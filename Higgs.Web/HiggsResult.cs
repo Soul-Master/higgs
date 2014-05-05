@@ -9,7 +9,8 @@ namespace Higgs.Web
     {
         public static JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
         };
 
         // Methods
