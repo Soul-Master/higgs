@@ -137,6 +137,7 @@
     <Compile Include="BaseController.cs" />
     <Compile Include="BaseStaticFileController.cs" />
     <Compile Include="BooleanModelBinder.cs" />
+    <Compile Include="TrimStringBinder.cs" />
     <Compile Include="JsonNetResult.cs" />
     <Compile Include="CombinedFileInfo.cs" />
     <Compile Include="CustomHttpStatusCode.cs" />
