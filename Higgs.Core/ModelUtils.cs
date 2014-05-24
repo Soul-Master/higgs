@@ -69,8 +69,7 @@ namespace Higgs.Core
         public static List<string> DefaultIgnoredPropertyList = new List<string> { "Id", "ID" };
         public static List<string> IgnoreTypeNameList = new List<string>()
         {
-            "System.Collection.*",
-            "System.Data.Entity.DynamicProxies.*"
+            "System.Collection.*"
         };
 
         public static int UpdateModel(this object oldData, object changedData, IEnumerable changedProperties = null, IEnumerable ignoredProperties = null)
@@ -96,7 +95,7 @@ namespace Higgs.Core
 
             var oldType = oldData.GetType();
             var changedType = changedData.GetType();
-            var changedPropertyDic = changedType.GetProperties().ToDictionary(x => x.Name.ToUpper());
+            var changedPropertyDic = changedType.GetProperties().ToDictionary(x => x.Name);
             var hasChanged = changedPropertyDic.Count > 0;
             var hasIgnored = ignoredPropDic.Count > 0;
 
