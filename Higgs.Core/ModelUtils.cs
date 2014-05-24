@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
+using Higgs.Core.Helpers;
+
 namespace Higgs.Core
 {
     public static class ModelUtils
@@ -63,38 +65,76 @@ namespace Higgs.Core
             return derivedObj;
         }
 
-        public static int UpdateModel(this object oldData, object changedData, IEnumerable changedProperties = null)
+        public static List<string> DefaultChangedPropertyList = new List<string>();
+        public static List<string> DefaultIgnoredPropertyList = new List<string> { "Id", "ID" };
+        public static List<string> IgnoreTypeNameList = new List<string>()
         {
-            var changedPropertyList = new List<string>();
+            "System.Collection.*",
+            "System.Data.Entity.DynamicProxies.*"
+        };
+
+        public static int UpdateModel(this object oldData, object changedData, IEnumerable changedProperties = null, IEnumerable ignoredProperties = null)
+        {
+            var changedPropDic = DefaultChangedPropertyList != null ? DefaultChangedPropertyList.ToDictionary(x => x, x => true) : new Dictionary<string, bool>();
+            var ignoredPropDic = DefaultIgnoredPropertyList != null ? DefaultIgnoredPropertyList.ToDictionary(x => x, x => true)  : new Dictionary<string, bool>();
             var count = 0;
 
             if (changedProperties != null)
             {
-                changedPropertyList.AddRange(from object propertyName in changedProperties
-                                             select propertyName.ToString());
+                foreach (var p in changedProperties)
+                {
+                    changedPropDic[p.ToString()] = true;
+                }
+            }
+            if (ignoredProperties != null)
+            {
+                foreach (var p in ignoredProperties)
+                {
+                    ignoredPropDic[p.ToString()] = true;
+                }
             }
 
             var oldType = oldData.GetType();
             var changedType = changedData.GetType();
+            var changedPropertyDic = changedType.GetProperties().ToDictionary(x => x.Name.ToUpper());
+            var hasChanged = changedPropertyDic.Count > 0;
+            var hasIgnored = ignoredPropDic.Count > 0;
 
-            foreach (var pi in changedType.GetProperties()
-                .Where
-                (
-                    x => x.Name.ToUpper() != "ID" &&
-                         x.CanRead &&
-                         x.CanWrite &&
-                         (changedProperties == null || changedPropertyList.Contains(x.Name)) &&
-                        x.PropertyType.FullName.StartsWith("System") &&
-                        !x.PropertyType.FullName.StartsWith("System.Collection") &&
-                        !x.PropertyType.FullName.StartsWith("System.Data.Entity.DynamicProxies")
-                ))
+            foreach (var pOld in oldType.GetProperties())
             {
-                var newValue = pi.GetValue(changedData, null);
-                var oldProp = oldType.GetProperty(pi.Name);
+                var pName = pOld.Name;
+                var typeFullName = pOld.PropertyType.FullName;
 
-                if (oldProp == null || !oldProp.CanWrite) continue;
+                if (!pOld.CanWrite) continue;
+                if (hasChanged && !changedPropertyDic.ContainsKey(pName)) continue;
+                if (hasIgnored && ignoredPropDic.ContainsKey(pName)) continue;
+                if (!changedPropertyDic.ContainsKey(pName)) continue;
 
-                oldProp.SetValue(oldData, newValue, null);
+                var changedProp = changedPropertyDic[pName];
+                if (!changedProp.CanRead) continue;
+                if (IgnoreTypeNameList != null)
+                {
+                    if (IgnoreTypeNameList.Any(x =>
+                        {
+                            if (x.EndsWith(".*"))
+                            {
+                                if (typeFullName.StartsWith(x.Substring(0, x.Length - 2))) return true;
+                            }
+                            else if(typeFullName == x)
+                            {
+                                return true;
+                            }
+
+                            return false;
+                        }))
+                    {
+                        continue;
+                    }
+                }
+
+                var newValue = changedProp.GetValue(changedData, null);
+                pOld.SetValue(oldData, newValue, null);
+
                 count++;
             }
 
