@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 
 namespace Higgs.Core.Helpers
 {
@@ -18,6 +20,12 @@ namespace Higgs.Core.Helpers
         public static T[] Add<T>(this T[] arr, params T[] items)
         {
             return arr.AddRange(items);
+        }
+
+        public static List<T> Clone<T>(this List<T> listToClone) 
+            where T : ICloneable
+        {
+            return listToClone.Select(item => (T)item.Clone()).ToList();
         }
 
         public static List<KeyValuePair<string, string>> ToList(this NameValueCollection items)
