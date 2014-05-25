@@ -13,6 +13,14 @@ namespace Higgs.Core.Helpers
 
             return attributes.Length == 0 ? "" : ((AssemblyProductAttribute)attributes[0]).Product;
         }
+
+        public static string GetProductTitle(this Assembly a)
+        {
+            // Get all Product attributes on this assembly
+            var attributes = a.GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
+
+            return attributes.Length == 0 ? "" : ((AssemblyTitleAttribute)attributes[0]).Title;
+        }
         
         public static string GetVersion(this Assembly a)
         {
