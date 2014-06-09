@@ -74,6 +74,7 @@ namespace Higgs.Core
 
         public static int UpdateModel(this object oldData, object changedData, IEnumerable changedProperties = null, IEnumerable ignoredProperties = null)
         {
+            // TODO: Reflector meanless variable names.
             var changedPropDic = DefaultChangedPropertyList != null ? DefaultChangedPropertyList.ToDictionary(x => x, x => true) : new Dictionary<string, bool>();
             var ignoredPropDic = DefaultIgnoredPropertyList != null ? DefaultIgnoredPropertyList.ToDictionary(x => x, x => true)  : new Dictionary<string, bool>();
             var count = 0;
@@ -106,8 +107,9 @@ namespace Higgs.Core
 
                 if (!pOld.CanWrite) continue;
                 if (hasChanged && !changedPropertyDic.ContainsKey(pName)) continue;
-                if (hasIgnored && ignoredPropDic.ContainsKey(pName)) continue;
                 if (!changedPropertyDic.ContainsKey(pName)) continue;
+                if (hasIgnored && ignoredPropDic.ContainsKey(pName)) continue;
+                if (hasChanged && !changedPropDic.ContainsKey(pName)) continue;
 
                 var changedProp = changedPropertyDic[pName];
                 if (!changedProp.CanRead) continue;
