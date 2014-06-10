@@ -97,7 +97,7 @@ namespace Higgs.Core
             var oldType = oldData.GetType();
             var changedType = changedData.GetType();
             var changedPropertyDic = changedType.GetProperties().ToDictionary(x => x.Name);
-            var hasChanged = changedPropertyDic.Count > 0;
+            var hasChanged = changedPropDic.Count > 0;
             var hasIgnored = ignoredPropDic.Count > 0;
 
             foreach (var pOld in oldType.GetProperties())
