@@ -88,10 +88,6 @@
       <Project>{8f16b6a5-c40b-4e67-a8eb-8702e3786ac4}</Project>
       <Name>Higgs.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Higgs.Web.Controls.JqGrid\Higgs.Web.Controls.JqGrid.csproj">
-      <Project>{7a8e0d58-b8c9-478c-84d6-f6460a3d08a0}</Project>
-      <Name>Higgs.Web.Controls.JqGrid</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Higgs.Web\Higgs.Web.csproj">
       <Project>{18c65593-e455-49f3-8aaa-9ae85e0942f4}</Project>
       <Name>Higgs.Web</Name>
@@ -119,9 +115,6 @@
     <Content Include="..\Higgs.Web\Content\Higgs\higgs.popup-menu.png">
       <Link>Packages\Higgs.Web\content\Content\Higgs\higgs.popup-menu.png</Link>
     </Content>
-    <Content Include="..\Higgs.Web\Scripts\Controls\higgs.controls.jqgrid.js">
-      <Link>Packages\Higgs.Web.Controls.JqGrid\content\Scripts\Higgs\Controls\higgs.controls.jqgrid.js</Link>
-    </Content>
     <Content Include="..\Higgs.Web\Scripts\Controls\higgs.dialog.js">
       <Link>Packages\Higgs.Web\content\Scripts\Higgs\Controls\higgs.dialog.js</Link>
     </Content>
@@ -144,8 +137,6 @@
     <None Include="NuGet.targets">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Packages\Higgs.Web.Controls.JqGrid\Higgs.Web.Controls.JqGrid.nuspec" />
-    <None Include="Packages\Higgs.Web.Controls.JqGrid.Core\Higgs.Web.Controls.JqGrid.Core.nuspec" />
     <None Include="Packages\Higgs.Web\Higgs.Web.nuspec" />
     <None Include="Packages\Higgs.Web.Core\Higgs.Web.Core.nuspec" />
     <None Include="Packages\Higgs\Higgs.nuspec" />
