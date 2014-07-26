@@ -52,7 +52,7 @@ namespace Higgs.Core.Helpers
             path = path.Replace("\\","/");
             baseDirectory = baseDirectory.Replace("/","\\");
 
-            if (baseDirectory.EndsWith("\\"))
+            if (baseDirectory.EndsWith("\\") && !baseDirectory.EndsWith(":\\"))
             {
                 baseDirectory = baseDirectory.Substring(0, baseDirectory.Length - 1);
             }
