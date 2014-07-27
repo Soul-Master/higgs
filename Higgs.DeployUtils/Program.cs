@@ -14,7 +14,6 @@ namespace Higgs.DeployUtils
     {
         static void Main(string[] args)
         {
-            args = new[] { @"D:\ChemInvent\ChemInvent", @"D:\" };
             var projectDir = new DirectoryInfo(args[0]);
             var deployDir = new DirectoryInfo(args[1]);
 
@@ -38,15 +37,23 @@ namespace Higgs.DeployUtils
                 foreach (Match m in scriptResults)
                 {
                     var scriptText = m.Value;
-                    var outputFile = IOHelpers.GetRelativePath(deployDir, IOHelpers.GetFullPath(m.Groups[1].Value.Trim(), deployDir));
+                    var outputFileFullName = IOHelpers.GetFullPath(m.Groups[1].Value.Trim(), deployDir);
+                    var outputFile = IOHelpers.GetRelativePath(deployDir, outputFileFullName);
+                    var inputFileList = new List<string>();
                     var inputFiles = "";
 
                     foreach (Match scriptMatch in srcRegex.Matches(scriptText))
                     {
-                        inputFiles += IOHelpers.GetRelativePath(deployDir, IOHelpers.GetFullPath(scriptMatch.Groups[1].Value.Trim(), projectDir)) + " ";
+                        var inputFileFullName = IOHelpers.GetFullPath(scriptMatch.Groups[1].Value.Trim(), deployDir);
+                        inputFileList.Add(inputFileFullName);
+
+                        inputFiles += IOHelpers.GetRelativePath(deployDir, inputFileFullName) + " ";
                     }
 
                     inputFiles = inputFiles.Trim();
+                    
+                    if (File.Exists(outputFileFullName)) File.Delete(outputFileFullName);
+
                     var cmdText = "uglifyjs " + inputFiles + " -o " + outputFile;
 
                     var process = new System.Diagnostics.Process();
@@ -63,6 +70,15 @@ namespace Higgs.DeployUtils
                     process.StartInfo = startInfo;
                     process.Start();
                     process.WaitForExit();
+
+                    if (File.Exists(outputFileFullName))
+                    {
+                        inputFileList.ForEach(File.Delete);
+                    }
+                    else
+                    {
+                        throw new Exception("Unable to generate minify file.");
+                    }
                 }
             }
         }
