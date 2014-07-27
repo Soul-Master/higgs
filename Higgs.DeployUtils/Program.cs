@@ -81,9 +81,9 @@ namespace Higgs.DeployUtils
                     if (process.ExitCode == 0)
                     {
                         inputFileList.ForEach(File.Delete);
-                        minifyList[outputFileFullName] = true;
 
                         Console.Write("Done" + Environment.NewLine);
+                        minifyList[outputFileFullName] = true;
                     }
                     else
                     {
@@ -130,6 +130,7 @@ namespace Higgs.DeployUtils
         {
             Console.WriteLine("  Minify CSS");
 
+            var minifyList = new Dictionary<string, bool>();
             var regex = new Regex(@"#minify:([^\n]+.css)[^\n]*\n[\s\S]+?#end", RegexOptions.Compiled);
             var srcRegex = new Regex(@"href=""([^\""]+.css)""", RegexOptions.Compiled);
 
@@ -161,6 +162,7 @@ namespace Higgs.DeployUtils
                     if (File.Exists(outputFileFullName)) continue;
 
                     var cmdText = "cleancss " + inputFiles + " -o " + outputFile;
+                    Console.Write("  - " + outputFile + " ");
 
                     var process = new System.Diagnostics.Process();
                     var startInfo = new System.Diagnostics.ProcessStartInfo();
@@ -177,14 +179,50 @@ namespace Higgs.DeployUtils
                     process.Start();
                     process.WaitForExit();
 
-                    if (File.Exists(outputFileFullName))
+                    if (process.ExitCode == 0)
                     {
                         inputFileList.ForEach(File.Delete);
+
+                        minifyList[outputFileFullName] = true;
+                        Console.Write("Done" + Environment.NewLine);
                     }
                     else
                     {
-                        throw new Exception("Unable to generate minify file.");
+                        Console.Write("Failed" + Environment.NewLine);
                     }
+                }
+            }
+
+            // Minify all other files
+            foreach (var filePath in Directory.GetFiles(deployDir, "*.css", SearchOption.AllDirectories))
+            {
+                if (minifyList.ContainsKey(filePath)) continue;
+
+                var cmdText = "cleancss " + filePath + " -o " + filePath;
+                Console.Write("  - " + IOHelpers.GetRelativePath(deployDir, filePath) + " ");
+
+                var process = new System.Diagnostics.Process();
+                var startInfo = new System.Diagnostics.ProcessStartInfo();
+                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+                startInfo.FileName = "cmd.exe";
+                startInfo.WorkingDirectory = deployDir;
+                startInfo.Arguments = "/C \"" + cmdText + "\"";
+                startInfo.RedirectStandardInput = true;
+                startInfo.RedirectStandardError = true;
+                startInfo.RedirectStandardOutput = true;
+                startInfo.CreateNoWindow = true;
+                startInfo.UseShellExecute = false;
+                process.StartInfo = startInfo;
+                process.Start();
+                process.WaitForExit();
+
+                if (process.ExitCode == 0)
+                {
+                    Console.Write("Done" + Environment.NewLine);
+                }
+                else
+                {
+                    Console.Write("Failed" + Environment.NewLine);
                 }
             }
         }
