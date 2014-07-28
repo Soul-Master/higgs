@@ -68,4 +68,4 @@ using System.Security;
  * 
 */
 #endregion
-[assembly: AssemblyInformationalVersion("3.0 Alpha")]
+[assembly: AssemblyInformationalVersion("3.0")]
