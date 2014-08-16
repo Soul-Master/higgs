@@ -6,7 +6,7 @@ namespace Higgs.Core.Security
     {
         public const uint DefaultSeed = 0xffffffff;
  
-        readonly static uint[] CrcTable = new uint[] {
+        readonly static uint[] CrcTable = {
                                                          0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419,
                                                          0x706AF48F, 0xE963A535, 0x9E6495A3, 0x0EDB8832, 0x79DCB8A4,
                                                          0xE0D5E91E, 0x97D2D988, 0x09B64C2B, 0x7EB17CBD, 0xE7B82D07,
@@ -61,28 +61,28 @@ namespace Higgs.Core.Security
                                                          0x2D02EF8D
                                                      };
  
-        uint crcValue;
+        uint _crcValue;
  
         public override void Initialize() {
-            crcValue = 0;
+            _crcValue = 0;
         }
  
         protected override void HashCore(byte[] buffer, int start, int length) {
-            crcValue ^= DefaultSeed;
+            _crcValue ^= DefaultSeed;
  
             unchecked {
                 while (--length >= 0) {
-                    crcValue = CrcTable[(crcValue ^ buffer[start++]) & 0xFF] ^ (crcValue >> 8);
+                    _crcValue = CrcTable[(_crcValue ^ buffer[start++]) & 0xFF] ^ (_crcValue >> 8);
                 }
             }
  
-            crcValue ^= DefaultSeed;
+            _crcValue ^= DefaultSeed;
         }
         protected override byte[] HashFinal() {
-            HashValue = new[] { (byte)((crcValue >> 24) & 0xff), 
-                                (byte)((crcValue >> 16) & 0xff), 
-                                (byte)((crcValue >> 8) & 0xff), 
-                                (byte)(crcValue & 0xff) };
+            HashValue = new[] { (byte)((_crcValue >> 24) & 0xff), 
+                                (byte)((_crcValue >> 16) & 0xff), 
+                                (byte)((_crcValue >> 8) & 0xff), 
+                                (byte)(_crcValue & 0xff) };
             return HashValue;
         }
         public uint CrcValue {

@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security;
 
 [assembly: AssemblyTitle("Higgs RIA Framework")]
 [assembly: AssemblyDescription("Rapid development framework for Microsoft ASP.NET MVC")]

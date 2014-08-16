@@ -3,6 +3,7 @@ using System.IO;
 
 namespace Higgs.Core.Helpers
 {
+// ReSharper disable once InconsistentNaming
     public static class IOHelpers
     {
         public static void WriteFile(this FileInfo file, Stream inputStream)
@@ -71,9 +72,9 @@ namespace Higgs.Core.Helpers
             {
                 if (!baseDirectory.EndsWith("\\\\") && !baseDirectory.EndsWith(":\\"))
                 {
-                    baseDirectory = baseDirectory.LastIndexOf("\\") - baseDirectory.IndexOf("\\") > 1 ? 
-                                                                                                          baseDirectory.Substring(0, baseDirectory.LastIndexOf("\\")) : 
-                                                                                                                                                                          baseDirectory.Substring(0, baseDirectory.LastIndexOf("\\") + 1);
+                    baseDirectory = baseDirectory.LastIndexOf("\\", StringComparison.Ordinal) - baseDirectory.IndexOf("\\", StringComparison.Ordinal) > 1 ? 
+                        baseDirectory.Substring(0, baseDirectory.LastIndexOf("\\", StringComparison.Ordinal)) : 
+                        baseDirectory.Substring(0, baseDirectory.LastIndexOf("\\", StringComparison.Ordinal) + 1);
                 }
 
                 path = path.Substring(3);

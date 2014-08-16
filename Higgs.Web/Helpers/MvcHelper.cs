@@ -59,12 +59,6 @@ namespace Higgs.Web.Helpers
             return result;
         }
 
-        public static HiggsResult Redirect<TController>(this HiggsResult result, Expression<Func<TController, object>> routeExp)
-            where TController : BaseController
-        {
-            return result.Redirect(routeExp.GetLogicalPath());
-        }
-
         public static HiggsResult Redirect(this HiggsResult result, ViewPageLocation location)
         {
             return result.Redirect(String.Format("~/{0}/{1}", location.ControllerName, location.ActionName));

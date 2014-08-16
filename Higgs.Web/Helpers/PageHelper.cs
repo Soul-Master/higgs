@@ -47,21 +47,6 @@ namespace Higgs.Web.Helpers
             return new MvcHtmlString(String.Format("<img id=\"{0}\" src=\"{1}\" alt=\"{2}\" />", id, helper.ResolveUrl(path), alt));
         }
 
-        public static MvcHtmlString GetApplicationUrl(this HtmlHelper helper)
-        {
-            return new MvcHtmlString(helper.ViewContext.HttpContext.Request.GetApplicationUrl());
-        }
-
-        public static MvcHtmlString HiggsInit(this HtmlHelper helper)
-        {
-            return new MvcHtmlString
-            (
-                "<script type=\"text/javascript\">" +
-                "$.baseUrl('" + helper.ViewContext.HttpContext.Request.GetApplicationUrl() + "');" +
-                "</script>"
-            );
-        }
-
         public static bool IsReadOnly(this HtmlHelper helper)
         {
             var readOnly = helper.ViewContext.RequestContext.HttpContext.Request["_readonly"];
@@ -77,58 +62,6 @@ namespace Higgs.Web.Helpers
             }   
             
             return path[0] == '~' ? VirtualPathUtility.ToAbsolute(path, helper.ViewContext.RequestContext.HttpContext.Request.ApplicationPath) : path;
-        }
-
-        public static MvcHtmlString Minify(this HtmlHelper helper, string combinedPath, params string[] filePaths)
-        {
-            if(filePaths.Length == 0) filePaths = new[] {combinedPath};
-
-            var fileType = combinedPath.EndsWith("js", StringComparison.CurrentCultureIgnoreCase) ? CombinedFileType.JavaScript : CombinedFileType.Css;
-
-            if (HttpContext.Current.IsDebuggingEnabled)
-            {
-                return fileType == CombinedFileType.JavaScript ? helper.JavaScriptFiles(filePaths) : helper.StyleSheetFiles(filePaths);
-            }
-
-            var currentExt = Path.GetExtension(combinedPath);
-            var file = CommonHelper.CombinedFile( new CombinedFileInfo
-            {
-                CombinedPath = currentExt != null && !currentExt.StartsWith(".min") ? Path.ChangeExtension(combinedPath, ".min" + currentExt) : combinedPath,
-                FilePaths = filePaths,
-                FileType = fileType
-            });
-
-            return file.FileType == CombinedFileType.JavaScript ? helper.JavaScriptFiles(file.CombinedPath + "?" + file.CheckSum) : helper.StyleSheetFiles(file.CombinedPath + "?" + file.CheckSum);
-        }
-
-        public static MvcHtmlString Minify<TController>(this HtmlHelper helper, string combinedPath, params ResourceInfo[] pages)
-            where TController : IController
-        {
-            return helper.Minify
-            (
-                combinedPath,
-                pages.Select
-                (
-                    x => typeof(TController).Assembly.GetJavaScriptResource(x.ControllerName, x.ViewName).FileName
-                ).ToArray()
-            );
-        }
-
-        public static MvcHtmlString JavaScriptFiles(this HtmlHelper helper, params string[] path)
-        {
-            var sb = new StringBuilder();
-
-            foreach (var p in path)
-            {
-                sb.Add(helper.JavaScript(helper.ResolveUrl(p), String.Empty).ToHtmlString());
-            }
-
-            return new MvcHtmlString(sb.ToString());
-        }
-
-        public static MvcHtmlString JavaScript(this HtmlHelper helper, string javaScript)
-        {
-            return helper.JavaScript(null, javaScript);
         }
 
         public static MvcHtmlString StaticHtml(this HtmlHelper helper, string path)

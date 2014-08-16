@@ -94,45 +94,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Higgs.Web\Content\Higgs\higgs.control.base.css">
-      <Link>Packages\Higgs.Web\content\Content\Higgs\higgs.control.base.css</Link>
-    </Content>
-    <Content Include="..\Higgs.Web\Content\Higgs\higgs.dialog.css">
-      <Link>Packages\Higgs.Web\content\Content\Higgs\higgs.dialog.css</Link>
-    </Content>
-    <Content Include="..\Higgs.Web\Content\Higgs\higgs.dialog.loading-indicator.png">
-      <Link>Packages\Higgs.Web\content\Content\Higgs\higgs.dialog.loading-indicator.png</Link>
-    </Content>
-    <Content Include="..\Higgs.Web\Content\Higgs\higgs.dialog.png">
-      <Link>Packages\Higgs.Web\content\Content\Higgs\higgs.dialog.png</Link>
-    </Content>
-    <Content Include="..\Higgs.Web\Content\Higgs\higgs.dialog.progressbar.gif">
-      <Link>Packages\Higgs.Web\content\Content\Higgs\higgs.dialog.progressbar.gif</Link>
-    </Content>
-    <Content Include="..\Higgs.Web\Content\Higgs\higgs.popup-menu.css">
-      <Link>Packages\Higgs.Web\content\Content\Higgs\higgs.popup-menu.css</Link>
-    </Content>
-    <Content Include="..\Higgs.Web\Content\Higgs\higgs.popup-menu.png">
-      <Link>Packages\Higgs.Web\content\Content\Higgs\higgs.popup-menu.png</Link>
-    </Content>
-    <Content Include="..\Higgs.Web\Scripts\Controls\higgs.dialog.js">
-      <Link>Packages\Higgs.Web\content\Scripts\Higgs\Controls\higgs.dialog.js</Link>
-    </Content>
-    <Content Include="..\Higgs.Web\Scripts\higgs.core.js">
-      <Link>Packages\Higgs.Web\content\Scripts\Higgs\higgs.core.js</Link>
-    </Content>
-    <Content Include="..\Higgs.Web\Scripts\higgs.core.log.js">
-      <Link>Packages\Higgs.Web\content\Scripts\Higgs\higgs.core.log.js</Link>
-    </Content>
-    <Content Include="..\Higgs.Web\Scripts\higgs.validation.js">
-      <Link>Packages\Higgs.Web\content\Scripts\Higgs\higgs.validation.js</Link>
-    </Content>
-    <Content Include="..\Higgs.Web\Scripts\higgs.validation.messages.js">
-      <Link>Packages\Higgs.Web\content\Scripts\Higgs\higgs.validation.messages.js</Link>
-    </Content>
-    <Content Include="..\Higgs.Web\Scripts\higgs.validation.rules.js">
-      <Link>Packages\Higgs.Web\content\Scripts\Higgs\higgs.validation.rules.js</Link>
-    </Content>
+    <None Include="..\Higgs.Web\Content\Scripts\jquery.higgs.js.map">
+      <Link>Packages\Higgs.Web\content\Scripts\jquery.higgs.js.map</Link>
+      <DependentUpon>jquery.higgs.ts</DependentUpon>
+    </None>
     <None Include="app.config" />
     <None Include="NuGet.targets">
       <SubType>Designer</SubType>
@@ -145,6 +110,17 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <TypeScriptCompile Include="..\Higgs.Web\Content\Scripts\jquery.higgs.ts">
+      <Link>Packages\Higgs.Web\content\Scripts\jquery.higgs.ts</Link>
+    </TypeScriptCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Higgs.Web\Content\Scripts\jquery.higgs.js">
+      <Link>Packages\Higgs.Web\content\Scripts\jquery.higgs.js</Link>
+      <DependentUpon>jquery.higgs.ts</DependentUpon>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="NuGet.targets" />
 </Project>
