@@ -14,7 +14,7 @@ namespace Higgs.DeployUtils
     {
         static void Main(string[] args)
         {
-            //args = new[] { @"D:\ChemInvent\ChemInvent", @"D:\ChemInvent\ChemInvent\obj\Release\Package\PackageTmp" };
+            args = new[] { @"D:\ChemInvent\ChemInvent", @"D:\ChemInvent\ChemInvent\obj\Release\Package\PackageTmp" };
             var projectDir = new DirectoryInfo(args[0]);
             var deployDir = new DirectoryInfo(args[1]);
 
