@@ -21,7 +21,7 @@
     
     <Copy SourceFiles="$(OutDir)/Higgs.Core.dll" DestinationFolder="Packages/Higgs/lib/net40" />
     <Copy SourceFiles="$(ProjectDir)Packages\Higgs\Higgs.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs\Higgs.%(assemblyInfo.Version).nuspec" />
-    <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="2\.0\.0\.0" Replacement="%(assemblyInfo.Version)"
+    <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="3\.0\.0\.0" Replacement="%(assemblyInfo.Version)"
                                            Files="$(ProjectDir)Packages\Higgs\Higgs.%(assemblyInfo.Version).nuspec"/>
     <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs\Higgs.%(assemblyInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"
           WorkingDirectory="../.nuget" />
@@ -37,7 +37,7 @@
     
     <Copy SourceFiles="$(OutDir)/Higgs.Web.dll" DestinationFolder="Packages/Higgs.Web.Core/lib/net40" />
     <Copy SourceFiles="$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.%(assemblyInfo.Version).nuspec" />
-    <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="2\.0\.0\.0" Replacement="%(assemblyInfo.Version)" 
+    <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="3\.0\.0\.0" Replacement="%(assemblyInfo.Version)" 
                                            Files="$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.%(assemblyInfo.Version).nuspec"/>
     <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.%(assemblyInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"
           WorkingDirectory="../.nuget" />
@@ -53,12 +53,12 @@
     </GetAssemblyIdentity>
     
     <Copy SourceFiles="$(ProjectDir)Packages\Higgs.Web\Higgs.Web.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs.Web\Higgs.Web.%(assemblyInfo.Version).nuspec" />
-    <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="2\.0\.0\.0" Replacement="%(assemblyInfo.Version)" 
+    <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="3\.0\.0\.0" Replacement="%(assemblyInfo.Version)" 
                                            Files="$(ProjectDir)Packages\Higgs.Web\Higgs.Web.%(assemblyInfo.Version).nuspec"/>
     <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs.Web\Higgs.Web.%(assemblyInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"
           WorkingDirectory="../.nuget" />
     <Delete Files="$(ProjectDir)Packages\Higgs.Web\Higgs.Web.%(assemblyInfo.Version).nuspec" ContinueOnError="true" />
-    <RemoveDir Directories="Packages/Higgs.Web/content" />
+    <!--<RemoveDir Directories="Packages/Higgs.Web/content" />-->
     <Move SourceFiles="$(ProjectDir)Packages\Higgs.Web.%(assemblyInfo.Version).nupkg" DestinationFiles="$(ProjectDir)Packages\Higgs.Web.nupkg" />
     
   </Target>

@@ -55,12 +55,7 @@ namespace Higgs.Web.Helpers
         }
         
         public static string ResolveUrl(this HtmlHelper helper, string path) 
-        {   
-            if (String.IsNullOrEmpty(path))
-            {
-                path = "~/";
-            }   
-            
+        {
             return path[0] == '~' ? VirtualPathUtility.ToAbsolute(path, helper.ViewContext.RequestContext.HttpContext.Request.ApplicationPath) : path;
         }
 
@@ -69,6 +64,13 @@ namespace Higgs.Web.Helpers
             path = helper.ViewContext.HttpContext.Server.MapPath(path);
 
             return new MvcHtmlString(File.ReadAllText(path));
+        }
+
+        public static MvcHtmlString HiggsInit(this HtmlHelper helper)
+        {
+            var statement = "$.baseUrl(\"" + helper.ResolveUrl("~") + "\");";
+
+            return new MvcHtmlString("<script type=\"text/javascript\">" + statement + "</script>");
         }
     }
 }
