@@ -1,10 +1,11 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace Higgs.Core.Security
 {
-    public class HashFunction
+    public static class HashFunction
     {
         public static string Md5(string msg)
         {
@@ -74,7 +75,7 @@ namespace Higgs.Core.Security
             return crc32.CrcValue;
         }
         
-        public static string ByteArrayToString(byte[] inputArray)
+        public static string ByteArrayToString(IEnumerable<byte> inputArray)
         {
             var output = new StringBuilder("");
 

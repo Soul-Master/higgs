@@ -86,7 +86,6 @@
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Config.cs" />
-    <Compile Include="Configurations\CDataElement.cs" />
     <Compile Include="LazyCache.cs" />
     <Compile Include="Helpers\CollectionHelper.cs" />
     <Compile Include="Helpers\CoreExpressionHelper.cs" />

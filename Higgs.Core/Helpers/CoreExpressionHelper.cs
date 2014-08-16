@@ -10,40 +10,52 @@ namespace Higgs.Core.Helpers
     {
         public static IEnumerable<MemberInfo> GetMemberInfoesFromExpression<T>(Expression<Func<T,object>> expression)
         {
-            if(expression.Body is MemberExpression)
+            var body = expression.Body as MemberExpression;
+
+            if(body != null)
             {
-                var me = (MemberExpression)expression.Body;
+                var me = body;
 
                 yield return me.Member;
             }
-            else if(expression.Body is NewExpression)
+            else
             {
-                var ne = (NewExpression) expression.Body;
-                foreach (var me in ne.Arguments.Select(arg => arg as MemberExpression))
-                {
-                    if (me == null || me.Expression != expression.Parameters[0])
-                        throw new Exception(Resources.InvalidExpressionForGetMemberInfoes);
+                var newExpression = expression.Body as NewExpression;
 
-                    yield return me.Member;
-                }
-            }
-            else if (expression.Body is UnaryExpression)
-            {
-                var unary = (UnaryExpression)expression.Body;
-                var me = unary.Operand as MemberExpression;
-
-                if (me != null)
+                if(newExpression != null)
                 {
-                    yield return me.Member;
+                    var ne = newExpression;
+                    foreach (var me in ne.Arguments.Select(arg => arg as MemberExpression))
+                    {
+                        if (me == null || me.Expression != expression.Parameters[0])
+                            throw new Exception(Resources.InvalidExpressionForGetMemberInfoes);
+
+                        yield return me.Member;
+                    }
                 }
                 else
                 {
-                    throw new Exception(Resources.InvalidExpressionForGetMemberInfoes);
+                    var unaryExpression = expression.Body as UnaryExpression;
+
+                    if (unaryExpression != null)
+                    {
+                        var unary = unaryExpression;
+                        var me = unary.Operand as MemberExpression;
+
+                        if (me != null)
+                        {
+                            yield return me.Member;
+                        }
+                        else
+                        {
+                            throw new Exception(Resources.InvalidExpressionForGetMemberInfoes);
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception(Resources.InvalidExpressionForGetMemberInfoes);
+                    }
                 }
-            }
-            else
-            {
-                throw new Exception(Resources.InvalidExpressionForGetMemberInfoes);
             }
         }
     }

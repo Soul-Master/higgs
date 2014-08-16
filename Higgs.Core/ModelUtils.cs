@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-using Higgs.Core.Helpers;
-
 namespace Higgs.Core
 {
     public static class ModelUtils
@@ -65,12 +63,16 @@ namespace Higgs.Core
             return derivedObj;
         }
 
+        // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable FieldCanBeMadeReadOnly.Global
         public static List<string> DefaultChangedPropertyList = new List<string>();
         public static List<string> DefaultIgnoredPropertyList = new List<string> { "Id", "ID" };
-        public static List<string> IgnoreTypeNameList = new List<string>()
+        public static List<string> IgnoreTypeNameList = new List<string>
         {
             "System.Collection.*"
         };
+        // ReSharper restore FieldCanBeMadeReadOnly.Global
+        // ReSharper restore MemberCanBePrivate.Global
 
         public static int UpdateModel(this object oldData, object changedData, IEnumerable changedProperties = null, IEnumerable ignoredProperties = null)
         {
