@@ -873,7 +873,7 @@ var Higgs;
             };
 
             RequiredValidation.create = function (el, data) {
-                var required = data.required || el.required;
+                var required = data.required || $(el).attr('required');
 
                 if (!required)
                     return null;
