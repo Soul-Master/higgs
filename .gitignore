@@ -156,3 +156,6 @@ $RECYCLE.BIN/
 /_Nuget.Higgs/Packages/Higgs.Web.Controls.JqGrid.Core/lib/net40/Higgs.Web.Controls.JqGrid.dll
 
 /_Nuget.Higgs/Packages/Higgs/lib/net40/Higgs.Core.dll
+/_Nuget.Higgs/Packages/Higgs.Web/content/Scripts/jquery.higgs.js
+/_Nuget.Higgs/Packages/Higgs.Web/content/Scripts/jquery.higgs.js.map
+/_Nuget.Higgs/Packages/Higgs.Web/content/Scripts/jquery.higgs.ts
