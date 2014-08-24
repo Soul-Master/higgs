@@ -1071,7 +1071,7 @@ module Higgs.Rules
 
         static create(el: HTMLInputElement, data: { required: any }) : Higgs.AbstructValidation
         {
-            var required = data.required || el.required;
+            var required = data.required || $(el).attr('required');
 
             if (!required) return null;
             if (required === 'required') required = true; // Case when set data-required="required" should create same validation as required="required"
