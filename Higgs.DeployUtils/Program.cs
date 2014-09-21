@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Higgs.Core.Helpers;
 
@@ -20,155 +21,34 @@ namespace Higgs.DeployUtils
             RemoveEmptyDir(deployDir.FullName);
         }
 
-        static void MinifyJs(IEnumerable<FileInfo> viewPages, string deployDir)
+        static void MinifyJs(IEnumerable<FileInfo> viewPages, string workingDir)
         {
             Console.WriteLine("Minify JavaScript");
 
-            var minifyList = new Dictionary<string, bool>();
-            var regex = new Regex(@"#minify:([^\n]+.js)[^\n]*\n[\s\S]+?#end", RegexOptions.Compiled);
-            var srcRegex = new Regex(@"src=""([^\""]+.js)""", RegexOptions.Compiled);
+            // Raw: @if[^\{]+{(\s*<script [^>]*src="([^"]+)"[^>]*><\/script>\s*){2,}}\s*else\s*{\s*<script [^>]*src="([^"]+)"[^>]*data-minify[^>]*><\/script>\s*}
+            var pattern = new Regex("@if[^\\{]+{(\\s*<script [^>]*src=\"([^\"]+)\"[^>]*><\\/script>\\s*){2,}}\\s*else\\s*{\\s*<script [^>]*src=\"([^\"]+)\"[^>]*data-minify[^>]*><\\/script>\\s*}", RegexOptions.Compiled);
 
-            foreach (var page in viewPages)
+            MinifyFile(viewPages, workingDir, pattern, "js", (inputFiles, outputFile) =>
             {
-                var content = File.ReadAllText(page.FullName);
+                var cmd = "uglifyjs " + inputFiles + " -o " + outputFile;
 
-                var scriptResults = regex.Matches(content);
-
-                foreach (Match m in scriptResults)
-                {
-                    var scriptText = m.Value;
-                    var logicalOutputPath = m.Groups[1].Value.Trim();
-                    var outputFileFullName = IOHelpers.GetFullPath(logicalOutputPath, deployDir);
-                    var outputFile = IOHelpers.GetRelativePath(deployDir, outputFileFullName);
-                    var inputFileList = new List<string>();
-                    var inputFiles = "";
-
-                    foreach (Match scriptMatch in srcRegex.Matches(scriptText))
-                    {
-                        var inputFileFullName = IOHelpers.GetFullPath(scriptMatch.Groups[1].Value.Trim(), deployDir);
-                        inputFileList.Add(inputFileFullName);
-
-                        inputFiles += IOHelpers.GetRelativePath(deployDir, inputFileFullName) + " ";
-                    }
-
-                    inputFiles = inputFiles.Trim();
-
-                    if (File.Exists(outputFileFullName)) continue;
-
-                    if (ExecuteMinifyJs(inputFiles, outputFile, deployDir))
-                    {
-                        inputFileList.ForEach(File.Delete);
-                        minifyList[outputFileFullName] = true;
-                    }
-                }
-            }
-
-            // Minify all other files
-            foreach (var filePath in Directory.GetFiles(deployDir, "*.js", SearchOption.AllDirectories))
-            {
-                if (minifyList.ContainsKey(filePath)) continue;
-                
-                ExecuteMinifyJs(filePath, filePath, deployDir);
-            }
-        }
-        
-        static bool ExecuteMinifyJs(string inputFiles, string outputFile, string workingDirectory)
-        {
-            var cmdText = "uglifyjs " + inputFiles + " -o " + outputFile;
-            Console.WriteLine("- " + IOHelpers.GetRelativePath(workingDirectory, outputFile) + " ");
-
-            var process = new System.Diagnostics.Process();
-            var startInfo = new System.Diagnostics.ProcessStartInfo
-            {
-                WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal,
-                FileName = "cmd.exe",
-                WorkingDirectory = workingDirectory,
-                Arguments = "/C \"" + cmdText + "\"",
-                RedirectStandardInput = true,
-                RedirectStandardError = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = false,
-                UseShellExecute = false
-            };
-            process.StartInfo = startInfo;
-            process.Start();
-            process.WaitForExit();
-
-            return process.ExitCode == 0;
+                return ExecuteProcess(workingDir, cmd);
+            });
         }
 
-        static void MinifyCss(IEnumerable<FileInfo> viewPages, string deployDir)
+        static void MinifyCss(IEnumerable<FileInfo> viewPages, string workingDir)
         {
             Console.WriteLine("Minify CSS");
 
-            var minifyList = new Dictionary<string, bool>();
             // Raw: @if[^\{]+{(\s*<link [^>]*href="([^"]+)"[^>]*/>\s*){2,}}\s*else\s*{\s*<link [^>]*href="([^"]+)"[^>]*data-minify[^>]*/>\s*}
-            var regex = new Regex("@if[^\\{]+{(\\s*<link [^>]*href=\"([^\"]+)\"[^>]*/>\\s*){2,}}\\s*else\\s*{\\s*<link [^>]*href=\"([^\"]+)\"[^>]*data-minify[^>]*/>\\s*}", RegexOptions.Compiled);
-            
-            foreach (var page in viewPages)
+            var pattern = new Regex("@if[^\\{]+{(\\s*<link [^>]*href=\"([^\"]+)\"[^>]*/>\\s*){2,}}\\s*else\\s*{\\s*<link [^>]*href=\"([^\"]+)\"[^>]*data-minify[^>]*/>\\s*}", RegexOptions.Compiled);
+
+            MinifyFile(viewPages, workingDir, pattern, "css", (inputFiles, outputFile) =>
             {
-                var content = File.ReadAllText(page.FullName);
+                var cmd = "cleancss " + inputFiles + " -o " + outputFile;
 
-                var scriptResults = regex.Matches(content);
-
-                foreach (Match m in scriptResults)
-                {
-                    var logicalOutputPath = m.Groups[3].Value;
-                    var outputFileFullName = IOHelpers.GetFullPath(logicalOutputPath, deployDir);
-                    var outputFile = IOHelpers.GetRelativePath(deployDir, outputFileFullName);
-                    var inputFileList = new List<string>();
-                    var inputFiles = string.Empty;
-
-                    foreach (Capture c in m.Groups[2].Captures)
-                    {
-                        var inputFileFullName = IOHelpers.GetFullPath(c.Value, deployDir);
-                        inputFileList.Add(inputFileFullName);
-
-                        inputFiles += IOHelpers.GetRelativePath(deployDir, inputFileFullName) + " ";
-                    }
-
-                    inputFiles = inputFiles.Trim();
-
-                    if (ExecuteMinifyCss(inputFiles, outputFile, deployDir))
-                    {
-                        inputFileList.ForEach(File.Delete);
-                        minifyList[outputFileFullName] = true;
-                    }
-                }
-            }
-
-            // Minify all other files
-            foreach (var filePath in Directory.GetFiles(deployDir, "*.css", SearchOption.AllDirectories))
-            {
-                if (minifyList.ContainsKey(filePath)) continue;
-
-                ExecuteMinifyCss(filePath, filePath, deployDir);
-            }
-        }
-        
-        static bool ExecuteMinifyCss(string inputFiles, string outputFile, string workingDirectory)
-        {
-            var cmdText = "cleancss " + inputFiles + " -o " + outputFile;
-            Console.WriteLine("- " + IOHelpers.GetRelativePath(workingDirectory, outputFile) + " ");
-
-            var process = new System.Diagnostics.Process();
-            var startInfo = new System.Diagnostics.ProcessStartInfo
-            {
-                WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal,
-                FileName = "cmd.exe",
-                WorkingDirectory = workingDirectory,
-                Arguments = "/C \"" + cmdText + "\"",
-                RedirectStandardInput = true,
-                RedirectStandardError = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = false,
-                UseShellExecute = false
-            };
-            process.StartInfo = startInfo;
-            process.Start();
-            process.WaitForExit();
-
-            return process.ExitCode == 0;
+                return ExecuteProcess(workingDir, cmd);
+            });
         }
 
         static void RemoveEmptyDir(string dir)
@@ -182,6 +62,79 @@ namespace Higgs.DeployUtils
                     Directory.Delete(directory, false);
                 }
             }
+        }
+
+        static void MinifyFile(IEnumerable<FileInfo> viewPages, string workingDir, Regex pattern, string extension, Func<string, string, bool> minifyFn)
+        {
+            var outputFiles = new Dictionary<string, bool>();
+
+            // Search for multiple files minification.
+            foreach (var page in viewPages)
+            {
+                var content = File.ReadAllText(page.FullName);
+
+                var scriptResults = pattern.Matches(content);
+
+                foreach (Match m in scriptResults)
+                {
+                    var logicalOutputPath = m.Groups[3].Value;
+                    var outputFileFullName = IOHelpers.GetFullPath(logicalOutputPath, workingDir);
+                    var outputFile = IOHelpers.GetRelativePath(workingDir, outputFileFullName);
+                    var inputFileList = new List<string>();
+                    var inputFiles = string.Empty;
+
+                    if (outputFiles.ContainsKey(outputFileFullName)) continue;
+
+                    foreach (Capture c in m.Groups[2].Captures)
+                    {
+                        var inputFileFullName = IOHelpers.GetFullPath(c.Value, workingDir);
+                        inputFileList.Add(inputFileFullName);
+
+                        inputFiles += IOHelpers.GetRelativePath(workingDir, inputFileFullName) + " ";
+                    }
+
+                    inputFiles = inputFiles.Trim();
+
+                    Console.WriteLine("- " + IOHelpers.GetRelativePath(workingDir, outputFile));
+                    if (minifyFn(inputFiles, outputFile))
+                    {
+                        outputFiles[outputFileFullName] = true;
+
+                        inputFileList.ForEach(File.Delete);
+                    }
+                }
+            }
+
+            // Minify all other files
+            foreach (var filePath in Directory.GetFiles(workingDir, "*." + extension, SearchOption.AllDirectories))
+            {
+                if (outputFiles.ContainsKey(filePath)) continue;
+
+                Console.WriteLine("- " + IOHelpers.GetRelativePath(workingDir, filePath));
+                minifyFn(filePath, filePath);
+            }
+        }
+
+        static bool ExecuteProcess(string workingDir, string cmd)
+        {
+            var process = new System.Diagnostics.Process();
+            var startInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal,
+                FileName = "cmd.exe",
+                WorkingDirectory = workingDir,
+                Arguments = "/C \"" + cmd + "\"",
+                RedirectStandardInput = true,
+                RedirectStandardError = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = false,
+                UseShellExecute = false
+            };
+            process.StartInfo = startInfo;
+            process.Start();
+            process.WaitForExit();
+
+            return process.ExitCode == 0;
         }
     }
 }
