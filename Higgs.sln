@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{24B57E53-8431-459E-B12A-5270611A0518}"
 	ProjectSection(SolutionItems) = preProject
@@ -20,11 +20,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{8379E7
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Nuget.Higgs", "_Nuget.Higgs", "{1DF701ED-ABD1-4801-9A09-B48744556B51}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet Packages", "NuGet Packages", "{1DF701ED-ABD1-4801-9A09-B48744556B51}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Higgs.NuGet", "_Nuget.Higgs\Higgs.NuGet.csproj", "{5327C6C1-BCCB-4BF3-80DA-15E343234E1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Higgs.DeployUtils", "Higgs.DeployUtils\Higgs.DeployUtils.csproj", "{F4CEF143-8D43-4536-8F34-0A7350D48A63}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Higgs.WebOptimizer", "Higgs.WebOptimizer\Higgs.WebOptimizer.csproj", "{F4CEF143-8D43-4536-8F34-0A7350D48A63}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

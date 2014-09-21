@@ -88,6 +88,10 @@
       <Project>{8f16b6a5-c40b-4e67-a8eb-8702e3786ac4}</Project>
       <Name>Higgs.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Higgs.WebOptimizer\Higgs.WebOptimizer.csproj">
+      <Project>{f4cef143-8d43-4536-8f34-0a7350d48a63}</Project>
+      <Name>Higgs.WebOptimizer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Higgs.Web\Higgs.Web.csproj">
       <Project>{18c65593-e455-49f3-8aaa-9ae85e0942f4}</Project>
       <Name>Higgs.Web</Name>
@@ -99,6 +103,10 @@
     </Content>
     <None Include="app.config" />
     <None Include="NuGet.targets">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Packages\Higgs.WebOptimizerTask\Higgs.WebOptimizerTask.nuspec" />
+    <None Include="Packages\Higgs.WebOptimizerTask\build\WebOptimizer.targets">
       <SubType>Designer</SubType>
     </None>
     <None Include="Packages\Higgs.Web\Higgs.Web.nuspec" />
@@ -117,6 +125,9 @@
     <Content Include="..\Higgs.Web\Content\Scripts\jquery.higgs.ts">
       <Link>Packages\Higgs.Web\content\Scripts\jquery.higgs.ts</Link>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Packages\Higgs.WebOptimizerTask\tools\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="NuGet.targets" />

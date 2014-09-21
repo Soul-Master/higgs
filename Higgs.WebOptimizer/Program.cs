@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Higgs.Core.Helpers;
 
-namespace Higgs.DeployUtils
+namespace Higgs.WebOptimizer
 {
     class Program
     {
