@@ -109,6 +109,7 @@
     <None Include="Packages\Higgs.WebOptimizerTask\build\Higgs.WebOptimizerTask.targets">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Packages\Higgs.WebOptimizerTask\tools\Install.ps1" />
     <None Include="Packages\Higgs.Web\Higgs.Web.nuspec" />
     <None Include="Packages\Higgs.Web.Core\Higgs.Web.Core.nuspec" />
     <None Include="Packages\Higgs\Higgs.nuspec" />
@@ -126,9 +127,7 @@
       <Link>Packages\Higgs.Web\content\Scripts\jquery.higgs.ts</Link>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Packages\Higgs.WebOptimizerTask\tools\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="NuGet.targets" />
 </Project>
