@@ -95,7 +95,6 @@
     <Compile Include="Helpers\ReflectionHelper.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Helpers\TypeHelper.cs" />
-    <Compile Include="Interfaces\IObjectUnbrowsable.cs" />
     <Compile Include="IValue.cs" />
     <Compile Include="ModelUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

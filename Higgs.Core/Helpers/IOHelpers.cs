@@ -32,7 +32,10 @@ namespace Higgs.Core.Helpers
 
         public static string GetRelativePath(string currentDirectory, string filePath)
         {
-            var uriFile = new Uri(filePath);
+            Uri uriFile;
+
+            if (!Uri.TryCreate(filePath, UriKind.Absolute, out uriFile)) return filePath;
+
             var uriCurrentDir = new Uri(currentDirectory + (!currentDirectory.EndsWith("\\") ? "\\" : ""));
 
             return uriCurrentDir.MakeRelativeUri(uriFile).ToString();

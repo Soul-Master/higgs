@@ -1,4 +1,4 @@
-﻿npm install grunt -g
-npm install grunt-cli -g
-npm install clean-css -g
-npm install uglify-js -g
+﻿npm install grunt
+npm install grunt-cli
+npm install clean-css
+npm install uglify-js
