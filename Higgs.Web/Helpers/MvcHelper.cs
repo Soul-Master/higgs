@@ -59,11 +59,6 @@ namespace Higgs.Web.Helpers
             return result;
         }
 
-        public static HiggsResult Redirect(this HiggsResult result, ViewPageLocation location)
-        {
-            return result.Redirect(String.Format("~/{0}/{1}", location.ControllerName, location.ActionName));
-        }
-
         public static HiggsResult AddCustomError(this HiggsResult result, string errorMessage)
         {
             if (!result.ErrorList.ContainsKey("custom-error"))
