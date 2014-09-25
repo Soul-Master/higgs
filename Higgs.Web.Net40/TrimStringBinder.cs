@@ -2,22 +2,23 @@
 
 namespace Higgs.Web
 {
-    public class TrimStringBinder : IModelBinder
+    public class TrimModelBinder : DefaultModelBinder
     {
-        public object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
+        protected override void SetProperty(ControllerContext controllerContext,
+          ModelBindingContext bindingContext,
+          System.ComponentModel.PropertyDescriptor propertyDescriptor, object value)
         {
-            var valueResult = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
+            if (propertyDescriptor.PropertyType == typeof(string))
+            {
+                var stringValue = (string)value;
+                if (!string.IsNullOrEmpty(stringValue))
+                    stringValue = stringValue.Trim();
 
-            if (valueResult == null || string.IsNullOrEmpty(valueResult.AttemptedValue))
-            {
-                bindingContext.Model = null;
-            }
-            else
-            {
-                bindingContext.Model = valueResult.AttemptedValue.Trim();
+                value = stringValue;
             }
 
-            return true;
+            base.SetProperty(controllerContext, bindingContext,
+                                propertyDescriptor, value);
         }
     }
 }
