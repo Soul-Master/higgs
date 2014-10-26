@@ -39,8 +39,12 @@ namespace Higgs.Web.Helpers
         {
             var temp = CoreExpressionHelper.GetMemberInfoesFromExpression(selectedPropertyExpression);
             var affectedKeys = temp.Aggregate("", (current, mi) => current + (mi.Name + "|"));
+            var properties = affectedKeys.Split(new[] {"|"}, StringSplitOptions.RemoveEmptyEntries);
 
-            result.AddCustomError(affectedKeys.Substring(0, affectedKeys.Length - 1), errorMessage);
+            foreach (var p in properties)
+            {
+                result.AddCustomError(p, errorMessage);
+            }
 
             return result;
         }
