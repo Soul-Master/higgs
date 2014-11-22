@@ -78,6 +78,12 @@ namespace Higgs.Web.Helpers
 
         public static HiggsResult AddCustomError(this HiggsResult result, string key, string errorMessage)
         {
+            var tokens = key.Split(new [] { ",", " " }, StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length > 1)
+            {
+                tokens.ForEach(x => AddCustomError(result, x, errorMessage));
+                return result;
+            }
             if (!result.ErrorList.ContainsKey(key))
             {
                 result.ErrorList.Add(key, new List<string>());

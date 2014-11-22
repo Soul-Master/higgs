@@ -31,8 +31,111 @@ var Higgs;
     ;
 
     Higgs.disableElementSelect = ':input, button, .btn';
+
+    Higgs.locales = new Array();
+    Higgs.locale;
+    function setLanguage(code) {
+        var loc = null;
+
+        for (var i = 0; i < Higgs.locales.length; i++) {
+            if (Higgs.locales[i].name.toUpperCase() === code.toUpperCase()) {
+                loc = Higgs.locales[i];
+            }
+        }
+
+        if (loc) {
+            Higgs.locale = loc;
+            return true;
+        }
+
+        return false;
+    }
+    Higgs.setLanguage = setLanguage;
+    ;
 })(Higgs || (Higgs = {}));
 
+(function (locales) {
+    var f = function (message) {
+        return function () {
+            return message.format(this);
+        };
+    };
+
+    locales.push({
+        name: 'en',
+        rules: {
+            requiredValidation: f('Please specify'),
+            stringLengthValidation: f('Data must be between {minLength}-{maxLength} characters in length.'),
+            stringLengthValidation_NullMinLength: f('Data length greater than {maxLength} characters'),
+            stringLengthValidation_NullMaxLength: f('Data length less than {minLength} characters'),
+            patternValidation: f('Data is not in the correct format'),
+            numberValidation_Integer: f('Data is not a valid integer'),
+            numberValidation_Decimal: f('Data is not a valid number'),
+            urlValidation: f('Data is not a valid URL'),
+            emailValidation: f('Data is not a valid email address'),
+            moreThanValidation: f('Data should has value more than {value}'),
+            minValidation: f('Data should has value at least {value}'),
+            lessThanValidation: f('Data should has value less than {value}'),
+            maxValidation: f('Data should has value less than or equal {value}'),
+            equalValidation: f('Data should has value equal to {label:{equalProperty}}'),
+            notEqualValidation: f('Data should has value not equal to {label:{notEqualProperty}}')
+        }
+    });
+    locales.push({
+        name: 'th',
+        rules: {
+            requiredValidation: f('กรุณาระบุข้อมูล'),
+            stringLengthValidation: f('ข้อมูลต้องมีความยาวระหว่าง {minLength}-{maxLength} ตัวอักษร'),
+            stringLengthValidation_NullMinLength: f('ข้อมูลต้องมีความยาวไม่เกิน {maxLength} ตัวอักษร'),
+            stringLengthValidation_NullMaxLength: f('ข้อมูลต้องมีความยาวอย่างน้อย {minLength} ตัวอักษร'),
+            patternValidation: f('รูปแบบข้อมูลไม่ถูกต้อง'),
+            numberValidation_Integer: f('ข้อมูลต้องเป็นตัวเลขจำนวนเต็มเท่านั้น'),
+            numberValidation_Decimal: f('ข้อมูลต้องเป็นตัวเลขเท่านั้น'),
+            urlValidation: f('ข้อมูลต้องเป็น Url ที่ถูกต้อง'),
+            emailValidation: f('ข้อมูลต้องเป็น e-mail ที่ถูกต้อง'),
+            moreThanValidation: f('ข้อมูลต้องมีค่ามากกว่า {value}'),
+            minValidation: f('ข้อมูลต้องมีมากกว่าเท่ากับ {value}'),
+            lessThanValidation: f('ข้อมูลต้องมีค่าน้อยกว่า {value}'),
+            maxValidation: f('ข้อมูลต้องมีค่าน้อยกว่าหรือเท่ากับ {value}'),
+            equalValidation: f('ข้อมูลต้องมีค่าเท่ากับ {label:{equalProperty}}'),
+            notEqualValidation: f('ข้อมูลต้องมีค่าไม่เท่ากับ {label:{notEqualProperty}}')
+        }
+    });
+})(Higgs.locales);
+
+Higgs.locale = Higgs.locales[0];
+
+
+// TODO: Make sure this function do same process as StringHelper.Format
+String.prototype.format = function () {
+    var data = [];
+    for (var _i = 0; _i < (arguments.length - 0); _i++) {
+        data[_i] = arguments[_i + 0];
+    }
+    var temp = this.toString();
+
+    for (var i = 0; i < data.length; i++) {
+        var par = data[i];
+
+        if (typeof par === 'object') {
+            if (!par)
+                continue;
+
+            for (var j in par) {
+                if (!par.hasOwnProperty(j))
+                    continue;
+                if (typeof par[j] === 'object' || par[j] === null || par[j] === undefined || $.isFunction(par[j]))
+                    continue;
+
+                temp = temp.replaceAll('{' + j + '}', par[j], true);
+            }
+        } else {
+            temp = temp.replaceAll('{' + i + '}', arguments[i], true);
+        }
+    }
+
+    return temp;
+};
 
 String.prototype.replaceAll = function (findString, newString, isIgnorCase) {
     var temp = this;
@@ -228,6 +331,18 @@ String.prototype.padLeft = function (length, padChar) {
             form.remove();
         }
     };
+
+    $.any = function (arr, filterFn) {
+        if (!arr || !$.isArray(arr) || !arr.length)
+            return false;
+
+        for (var i = 0; i < arr.length; i++) {
+            if (filterFn(arr[i]))
+                return true;
+        }
+
+        return false;
+    };
 })(jQuery);
 
 
@@ -294,11 +409,7 @@ String.prototype.padLeft = function (length, padChar) {
                     }
                 });
             } else {
-                var markText = x.data('watermark');
                 value = x.val();
-
-                if (value === markText)
-                    value = '';
             }
 
             return value;
@@ -562,10 +673,28 @@ var Higgs;
             if (!this.name)
                 return;
 
-            var value = $(this).value();
+            var el = $(this);
+            var value = el.value();
 
-            if (!settings.ignoreEmptyValue || value !== '')
+            if (settings.ignoreEmptyValue && (value === '' || value === null))
+                return;
+
+            var cValue = $.getObject(this.name, undefined, result);
+
+            if (el.is(':radio')) {
+                if (value) {
+                    $.setObject(this.name, value, result);
+                }
+            } else if (cValue !== undefined) {
+                if ($.isArray(cValue)) {
+                    var cArray = cValue;
+                    cArray.push(value);
+                } else {
+                    $.setObject(this.name, [cValue, value], result);
+                }
+            } else {
                 $.setObject(this.name, value, result);
+            }
         });
 
         return result;
@@ -857,6 +986,8 @@ var Higgs;
                             return true;
                     } else {
                         if (fieldOption.value === undefined) {
+                            if (context.parent[name] === false)
+                                return true;
                             if (Higgs.isEmpty(context.parent[name]))
                                 return true;
                         } else if (fieldOption.value !== context.parent[name]) {
@@ -869,7 +1000,7 @@ var Higgs;
             };
 
             RequiredValidation.prototype.message = function (context, value) {
-                return 'กรุณาระบุข้อมูล';
+                return Higgs.locale.rules.requiredValidation.apply(this, arguments);
             };
 
             RequiredValidation.create = function (el, data) {
@@ -922,12 +1053,11 @@ var Higgs;
 
             StringLengthValidation.prototype.message = function (context, value) {
                 if (this.minLength === null)
-                    return 'ข้อมูลต้องมีความยาวไม่เกิน ' + this.maxLength + ' ตัวอักษร';
+                    return Higgs.locale.rules.stringLengthValidation_NullMinLength.apply(this, arguments);
                 if (this.maxLength === null)
-                    return 'ข้อมูลต้องมีความยาวอย่างน้อย ' + this.minLength + ' ตัวอักษร';
+                    return Higgs.locale.rules.stringLengthValidation_NullMaxLength.apply(this, arguments);
 
-                // TODO: Use format
-                return 'ข้อมูลต้องมีความยาวระหว่าง ' + this.minLength + '-' + this.maxLength + ' ตัวอักษร';
+                return Higgs.locale.rules.stringLengthValidation.apply(this, arguments);
             };
 
             StringLengthValidation.create = function (el, data) {
@@ -975,7 +1105,7 @@ var Higgs;
             };
 
             PatternValidation.prototype.message = function (context, value) {
-                return 'รูปแบบข้อมูลไม่ถูกต้อง';
+                return Higgs.locale.rules.patternValidation.apply(this, arguments);
             };
 
             PatternValidation.create = function (el, data) {
@@ -998,10 +1128,10 @@ var Higgs;
             }
             NumberValidation.prototype.message = function (context, value) {
                 if (this.isInteger) {
-                    return 'ข้อมูลต้องเป็นตัวเลขจำนวนเต็มเท่านั้น';
+                    return Higgs.locale.rules.numberValidation_Integer.apply(this, arguments);
                 }
 
-                return 'ข้อมูลต้องเป็นตัวเลขเท่านั้น';
+                return Higgs.locale.rules.numberValidation_Decimal.apply(this, arguments);
             };
 
             NumberValidation.create = function (el, data) {
@@ -1036,7 +1166,7 @@ var Higgs;
             };
 
             UrlValidation.prototype.message = function (context, value) {
-                return 'ข้อมูลต้องเป็น Url ที่ถูกต้อง';
+                return Higgs.locale.rules.urlValidation.apply(this, arguments);
             };
 
             UrlValidation.create = function (el, data) {
@@ -1066,7 +1196,7 @@ var Higgs;
             };
 
             EmailValidation.prototype.message = function (context, value) {
-                return 'ข้อมูลต้องเป็น e-mail ที่ถูกต้อง';
+                return Higgs.locale.rules.emailValidation.apply(this, arguments);
             };
 
             EmailValidation.create = function (el, data) {
@@ -1098,7 +1228,7 @@ var Higgs;
             };
 
             MoreThanValidation.prototype.message = function (context, value) {
-                return 'ข้อมูลต้องมีค่ามากกว่า ' + this.value;
+                return Higgs.locale.rules.moreThanValidation.apply(this, arguments);
             };
 
             MoreThanValidation.create = function (el, data) {
@@ -1129,7 +1259,7 @@ var Higgs;
             };
 
             MinValidation.prototype.message = function (context, value) {
-                return 'ข้อมูลต้องมีค่ามากกว่าเท่ากับ ' + this.value;
+                return Higgs.locale.rules.minValidation.apply(this, arguments);
             };
 
             MinValidation.create = function (el, data) {
@@ -1166,7 +1296,7 @@ var Higgs;
             };
 
             LessThanValidation.prototype.message = function (context, value) {
-                return 'ข้อมูลต้องมีค่าน้อยกว่า ' + this.value;
+                return Higgs.locale.rules.lessThanValidation.apply(this, arguments);
             };
 
             LessThanValidation.create = function (el, data) {
@@ -1197,7 +1327,7 @@ var Higgs;
             };
 
             MaxValidation.prototype.message = function (context, value) {
-                return 'ข้อมูลต้องมีค่าน้อยกว่าหรือเท่ากับ ' + this.value;
+                return Higgs.locale.rules.maxValidation.apply(this, arguments);
             };
 
             MaxValidation.create = function (el, data) {
@@ -1235,7 +1365,7 @@ var Higgs;
             };
 
             EqualValidation.prototype.message = function (context, value) {
-                return 'ข้อมูลต้องมีค่าเท่ากับ {label:' + this.equalProperty + '}';
+                return Higgs.locale.rules.equalValidation.apply(this, arguments);
             };
 
             EqualValidation.create = function (el, data) {
@@ -1267,7 +1397,7 @@ var Higgs;
             };
 
             NotEqualValidation.prototype.message = function (context, value) {
-                return 'ข้อมูลต้องมีค่าไม่เท่ากับ {label:' + this.notEqualProperty + '}';
+                return Higgs.locale.rules.notEqualValidation.apply(this, arguments);
             };
 
             NotEqualValidation.create = function (el, data) {
@@ -1311,6 +1441,8 @@ var Higgs;
     fn.redraw = function () {
         return $(this).each(function () {
             var redraw = this.offsetHeight;
+
+            return redraw;
         });
     };
 
@@ -1366,6 +1498,10 @@ var Higgs;
                 }
 
                 feedback.insertAfter(input);
+                feedback.on('click', input, function (e) {
+                    var control = e.data;
+                    control.focus();
+                });
 
                 if (options.enableFadeInFeedback) {
                     feedback.addClass('fade').redraw().addClass('in');
@@ -1378,12 +1514,16 @@ var Higgs;
             if (input.is(':focus'))
                 input.trigger('focus');
 
-            input.on(blurEvent, function () {
+            var hidePopupFn = function () {
                 if (!popover || !popover.modalPopover)
                     return;
 
                 popover.modalPopover('hide');
-            });
+
+                // TODO: find out the better way to hide modal popover
+                popover.remove();
+            };
+            input.on(blurEvent, hidePopupFn);
         }
 
         return isValid;
