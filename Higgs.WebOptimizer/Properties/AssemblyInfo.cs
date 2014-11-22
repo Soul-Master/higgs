@@ -34,7 +34,7 @@ using System.Runtime.InteropServices;
  * - It allows for the re-creation of older builds.
  * - It clearly identifies upgrade and bug fix releases.
  * - It clearly identifies which version of the source code is in production.
- * 
+ *  
  * <major>.<minor>.<buildnumber>.<revision>
  * 
  * The File Version could follow this format:
@@ -52,7 +52,7 @@ using System.Runtime.InteropServices;
  *          Build Number = amount of normal building solution
 */
 #endregion
-[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.2.0")]
 
 #region Assembly Informational Version
 /*
@@ -82,4 +82,4 @@ using System.Runtime.InteropServices;
  * 
 */
 #endregion
-[assembly: AssemblyInformationalVersion("1.0 Beta")]
+[assembly: AssemblyInformationalVersion("1.0 RC")]

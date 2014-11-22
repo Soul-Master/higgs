@@ -16,7 +16,7 @@ module Higgs
         redirectTo: string;
         data: any;
     }
-    
+
     export function escapeRegex(text)
     {
         if (!text) return text.toString();
@@ -25,19 +25,157 @@ module Higgs
     };
 
     export var disableElementSelect = ':input, button, .btn';
+
+    export interface ILocale
+    {
+        name: string;
+        rules: ILocaleRules;
+    }
+
+    export interface ILocaleRules
+    {
+        // ReSharper disable InconsistentNaming
+
+        requiredValidation: (context: Higgs.ValidateContext<Object>, value: any) => string
+        stringLengthValidation: (context: Higgs.ValidateContext<Object>, value: any) => string
+        stringLengthValidation_NullMinLength: (context: Higgs.ValidateContext<Object>, value: any) => string
+        stringLengthValidation_NullMaxLength: (context: Higgs.ValidateContext<Object>, value: any) => string
+        patternValidation: (context: Higgs.ValidateContext<Object>, value: any) => string
+        numberValidation_Integer: (context: Higgs.ValidateContext<Object>, value: any) => string
+        numberValidation_Decimal: (context: Higgs.ValidateContext<Object>, value: any) => string
+        urlValidation: (context: Higgs.ValidateContext<Object>, value: any) => string
+        emailValidation: (context: Higgs.ValidateContext<Object>, value: any) => string
+        moreThanValidation: (context: Higgs.ValidateContext<Object>, value: any) => string
+        minValidation: (context: Higgs.ValidateContext<Object>, value: any) => string
+        lessThanValidation: (context: Higgs.ValidateContext<Object>, value: any) => string
+        maxValidation: (context: Higgs.ValidateContext<Object>, value: any) => string
+        equalValidation: (context: Higgs.ValidateContext<Object>, value: any) => string
+        notEqualValidation: (context: Higgs.ValidateContext<Object>, value: any) => string
+
+        // ReSharper restore InconsistentNaming
+    }
+
+    export var locales = new Array<ILocale>();
+    export var locale: ILocale;
+    export function setLanguage(code: string)
+    {
+        var loc: ILocale = null;
+
+        for (var i = 0; i < Higgs.locales.length; i++)
+        {
+            if (Higgs.locales[i].name.toUpperCase() === code.toUpperCase())
+            {
+                loc = Higgs.locales[i];
+            }
+        }
+
+        if (loc)
+        {
+            locale = loc;
+            return true;
+        }
+
+        return false;
+    };
 }
+
+(function (locales)
+{
+    var f = function (message: string)
+    {
+        return function () { return message.format(this); };
+    };
+    
+    locales.push
+    ({
+        name: 'en',
+        rules:
+        {
+            requiredValidation: f('Please specify'),
+            stringLengthValidation: f('Data must be between {minLength}-{maxLength} characters in length.'),
+            stringLengthValidation_NullMinLength: f('Data length greater than {maxLength} characters'),
+            stringLengthValidation_NullMaxLength: f('Data length less than {minLength} characters'),
+            patternValidation: f('Data is not in the correct format'),
+            numberValidation_Integer: f('Data is not a valid integer'),
+            numberValidation_Decimal: f('Data is not a valid number'),
+            urlValidation: f('Data is not a valid URL'),
+            emailValidation: f('Data is not a valid email address'),
+            moreThanValidation: f('Data should has value more than {value}'),
+            minValidation: f('Data should has value at least {value}'),
+            lessThanValidation: f('Data should has value less than {value}'),
+            maxValidation: f('Data should has value less than or equal {value}'),
+            equalValidation: f('Data should has value equal to {label:{equalProperty}}'),
+            notEqualValidation: f('Data should has value not equal to {label:{notEqualProperty}}')
+        }
+    });
+    locales.push
+    ({
+        name: 'th',
+        rules:
+        {
+            requiredValidation: f('กรุณาระบุข้อมูล'),
+            stringLengthValidation: f('ข้อมูลต้องมีความยาวระหว่าง {minLength}-{maxLength} ตัวอักษร'),
+            stringLengthValidation_NullMinLength: f('ข้อมูลต้องมีความยาวไม่เกิน {maxLength} ตัวอักษร'),
+            stringLengthValidation_NullMaxLength: f('ข้อมูลต้องมีความยาวอย่างน้อย {minLength} ตัวอักษร'),
+            patternValidation: f('รูปแบบข้อมูลไม่ถูกต้อง'),
+            numberValidation_Integer: f('ข้อมูลต้องเป็นตัวเลขจำนวนเต็มเท่านั้น'),
+            numberValidation_Decimal: f('ข้อมูลต้องเป็นตัวเลขเท่านั้น'),
+            urlValidation: f('ข้อมูลต้องเป็น Url ที่ถูกต้อง'),
+            emailValidation: f('ข้อมูลต้องเป็น e-mail ที่ถูกต้อง'),
+            moreThanValidation: f('ข้อมูลต้องมีค่ามากกว่า {value}'),
+            minValidation: f('ข้อมูลต้องมีมากกว่าเท่ากับ {value}'),
+            lessThanValidation: f('ข้อมูลต้องมีค่าน้อยกว่า {value}'),
+            maxValidation: f('ข้อมูลต้องมีค่าน้อยกว่าหรือเท่ากับ {value}'),
+            equalValidation: f('ข้อมูลต้องมีค่าเท่ากับ {label:{equalProperty}}'),
+            notEqualValidation: f('ข้อมูลต้องมีค่าไม่เท่ากับ {label:{notEqualProperty}}')
+        }
+    });
+})(Higgs.locales);
+
+Higgs.locale = Higgs.locales[0];
 
 // #region Object extension methods
 
 interface String 
 {
+    format(...data: Array<any>)
     replaceAll(findString: string, newString?: string, isIgnorCase?: Boolean): string;
     remove(findString: string): string;
     startsWith(value: string, isIgnoreCase?: boolean): boolean;
     endsWith(value: string, isIgnoreCase?: boolean): boolean;
     toCamelCase(): string;
-    padLeft(length:number, padChar: string): string;
+    padLeft(length: number, padChar: string): string;
 }
+
+// TODO: Make sure this function do same process as StringHelper.Format
+String.prototype.format = function (...data: Array<any>)
+{
+    var temp = this.toString();
+
+    for (var i = 0; i < data.length; i++)
+    {
+        var par = data[i];
+
+        if (typeof par === 'object')
+        {
+            if (!par) continue;
+
+            for (var j in par)
+            {
+                if (!par.hasOwnProperty(j)) continue;
+                if (typeof par[j] === 'object' || par[j] === null || par[j] === undefined || $.isFunction(par[j])) continue;
+
+                temp = temp.replaceAll('{' + j + '}', par[j], true);
+            }
+        }
+        else
+        {
+            temp = temp.replaceAll('{' + i + '}', arguments[i], true);
+        }
+    }
+
+    return temp;
+};
 
 String.prototype.replaceAll = function (findString: string, newString?: string, isIgnorCase?: Boolean)
 {
@@ -71,12 +209,12 @@ String.prototype.endsWith = function (value, isIgnoreCase = false)
     return this.toUpperCase().endsWith(value.toUpperCase());
 };
 
-String.prototype.toCamelCase = function()
+String.prototype.toCamelCase = function ()
 {
     return this.substring(0, 1).toLowerCase() + this.substring(1);
 };
 
-String.prototype.padLeft = function (length:number, padChar: string)
+String.prototype.padLeft = function (length: number, padChar: string)
 {
     padChar = padChar ? padChar : '0';
     var temp = this + '';
@@ -107,25 +245,26 @@ interface JQueryStatic
     sendData(url: string, data: Object, method?: string, isNewWindow?: boolean)
     sendData(url: string, data: string, isNewWindow?: boolean)
     sendData(url: string, data: string, method?: string, isNewWindow?: boolean)
+    any(arr: Array<any>, filterFn: Function)
 }
 
-(function($)
+(function ($)
 {
     var baseUrl: string;
 
-    $.newGuid = function() : string
+    $.newGuid = function (): string
     {
         // Return rfc4122 version 4 compliant GUID
         // Code From: http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
 
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) 
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) 
         {
-            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
     };
-    
-    $.baseUrl = function(url: string): string
+
+    $.baseUrl = function (url: string): string
     {
         if (url)
         {
@@ -135,7 +274,7 @@ interface JQueryStatic
         return baseUrl;
     };
 
-    $.getUrl = function(logicalPath?: string): string
+    $.getUrl = function (logicalPath?: string): string
     {
         if (!logicalPath) return location.href;
         if ((/^[a-z-]+:\/\//).test(logicalPath) || !baseUrl) return logicalPath;
@@ -147,30 +286,33 @@ interface JQueryStatic
 
     $.getObject = function (parts: any, defaultValue: any, context?: Object)
     {
-      if (typeof parts === 'string') {
+        if (typeof parts === 'string')
+        {
             // Support array index path without JavaScript syntax validation.
             // foo[0].bar
 
             parts = parts.match(/[0-9a-zA-Z_$]+/g);
         }
-      
+
         context = context || window;
-      
+
         var p;
-      
-        while (context && parts.length) {
+
+        while (context && parts.length)
+        {
             p = parts.shift();
 
-            if (context[p] === undefined) {
+            if (context[p] === undefined)
+            {
                 return defaultValue;
             }
 
             context = context[p];
         }
-      
+
         return context;
     };
-    
+
     $.setObject = function (name: string, value: any, context: Object)
     {
         var segments = name.split('.');
@@ -185,7 +327,7 @@ interface JQueryStatic
 
         return cursor[segments[i]] = value;
     };
-    
+
     $.postify = function (value: Object)
     {
         var result = {};
@@ -220,7 +362,7 @@ interface JQueryStatic
 
         return result;
     };
-    
+
     // Original code for http://www.filamentgroup.com/lab/jquery_plugin_for_requesting_ajax_like_file_downloads/
     $.sendData = function (url: string, data: any, method?: string, isNewWindow?: boolean)
     {
@@ -252,10 +394,10 @@ interface JQueryStatic
                 {
                     var pair = this.split('=');
                     $('<input type="hidden" />').attr
-                    ({
-                        name: pair[0],
-                        value: pair[1]
-                    }).appendTo(form);
+                        ({
+                            name: pair[0],
+                            value: pair[1]
+                        }).appendTo(form);
                 });
             }
             else
@@ -263,11 +405,11 @@ interface JQueryStatic
                 $.each(data, function (key, value)
                 {
                     $('<input />').attr
-                    ({
-                        type: 'hidden',
-                        name: key,
-                        value: value + ''
-                    }).appendTo(form);
+                        ({
+                            type: 'hidden',
+                            name: key,
+                            value: value + ''
+                        }).appendTo(form);
                 });
             }
         }
@@ -280,6 +422,18 @@ interface JQueryStatic
             form.remove();
         }
     };
+
+    $.any = function (arr: Array<any>, filterFn: Function)
+    {
+        if (!arr || !$.isArray(arr) || !arr.length) return false;
+
+        for (var i = 0; i < arr.length; i++)
+        {
+            if (filterFn(arr[i])) return true;
+        }
+
+        return false;
+    };
 })(jQuery);
 
 //#endregion
@@ -290,17 +444,17 @@ interface JQuery
 {
     ensureId(): JQuery;
     getEvents(): any;
-    disable(isDisabled?: boolean) : JQuery;
+    disable(isDisabled?: boolean): JQuery;
     value(): any;
     value(data: any): JQuery;
     submitForm(data?: Object): JQueryXHR;
 }
 
-(function(fn)
+(function (fn)
 {
-    fn.ensureId = function()
+    fn.ensureId = function ()
     {
-        $(this).each(function()
+        $(this).each(function ()
         {
             var el = $(this);
 
@@ -310,12 +464,12 @@ interface JQuery
         return this;
     };
 
-    fn.getEvents = function()
+    fn.getEvents = function ()
     {
-        return jQuery['_data'](this[0], "events" );
+        return jQuery['_data'](this[0], "events");
     };
 
-    fn.disable = function(isDisabled?: boolean): JQuery
+    fn.disable = function (isDisabled?: boolean): JQuery
     {
         if (isDisabled === undefined)
         {
@@ -327,12 +481,12 @@ interface JQuery
         controls.prop('disabled', isDisabled);
         controls.toggleClass('disabled', isDisabled);
         controls.trigger(isDisabled ? 'disabled' : 'enabled');
-        
+
         return this;
     };
 
     // TODO: refactor this.
-    fn.value = function(value?: any)
+    fn.value = function (value?: any)
     {
         var x = this;
 
@@ -365,25 +519,23 @@ interface JQuery
                     x = x.parents('form').find(':radio[name=' + x[0].name + ']');
                 }
 
-                x.each(function()
+                x.each(function ()
                 {
                     if (this.checked)
                     {
                         value = this.value;
                     }
                 });
-            } else
+            }
+            else
             {
-                var markText = x.data('watermark');
                 value = x.val();
-
-                if (value === markText) value = '';
             }
 
             return value;
         } else
         {
-            var compareValue = function(value1, value2)
+            var compareValue = function (value1, value2)
             {
                 if (value1 === undefined || value1 === null)
                 {
@@ -410,7 +562,7 @@ interface JQuery
                     x = x.parents('form').find(':radio[name=' + x[0].name + ']');
                 }
 
-                x.each(function()
+                x.each(function ()
                 {
                     if (compareValue(this.value, value))
                     {
@@ -435,7 +587,7 @@ interface JQuery
             {
                 var selectedValue;
 
-                $('option', x).each(function()
+                $('option', x).each(function ()
                 {
                     var cValue = $(this).val();
 
@@ -464,20 +616,20 @@ interface JQuery
         }
     };
 
-    fn.submitForm = function(data?: Object)
+    fn.submitForm = function (data?: Object)
     {
         var form = $(this);
         if (!data) data = form.serialize(true);
-        
+
         form.disable();
 
         return $.ajax
-        ({
-            type: 'POST',
-            dataType: 'json',
-            url: $.getUrl(form.attr('action')),
-            data: $.postify(data)
-        });
+            ({
+                type: 'POST',
+                dataType: 'json',
+                url: $.getUrl(form.attr('action')),
+                data: $.postify(data)
+            });
     };
 })(jQuery.fn);
 
@@ -492,7 +644,7 @@ interface JQuery
     deserialize(data: Object): JQuery;
     getValidationModel(modelData?: Object): Object;
     invalidateValidateCache(): JQuery;
-    validateModel(options?: Higgs.ValidateOptions) : Array<Higgs.ValidationResult>;
+    validateModel(options?: Higgs.ValidateOptions): Array<Higgs.ValidationResult>;
     getValidatedModel(): any;
 }
 
@@ -558,7 +710,7 @@ module Higgs
     {
         ignoreEmptyValue: boolean = true;
 
-        static defaultValue : SerializeOptions = new SerializeOptions();
+        static defaultValue: SerializeOptions = new SerializeOptions();
     }
 
     export class ValidateOptions
@@ -570,9 +722,9 @@ module Higgs
         validateTypes: {};
         validationContainer: JQuery;
 
-        static defaultValue : ValidateOptions = new ValidateOptions();
+        static defaultValue: ValidateOptions = new ValidateOptions();
     }
-    
+
     export class ValidateContext<T>
     {
         constructor(parent: T, container: JQuery)
@@ -584,7 +736,7 @@ module Higgs
         parent: T;
         validationContainer: JQuery;
     }
-    
+
     export class RuleData 
     {
         name: string;
@@ -597,9 +749,9 @@ module Higgs
     {
         return value === undefined || value != null && value.constructor === String && value === '';
     }
-    
+
     var validationRules = <Array<RuleData>>[];
-    
+
     export module Rules
     {
         export function register(name: string, rule: Function)
@@ -623,49 +775,49 @@ module Higgs
             validationRules.push(data);
         }
 
-        export function toArray() : Array<RuleData>
+        export function toArray(): Array<RuleData>
         {
             return $.extend(true, [], validationRules);
         }
 
-        export function getElementValidation() : Array<RuleData>
+        export function getElementValidation(): Array<RuleData>
         {
             return $.extend(true, [], validationRules.filter(x => !x.path));
         }
 
-        export function getPropertyValidationData() : Array<RuleData>
+        export function getPropertyValidationData(): Array<RuleData>
         {
             return $.extend(true, [], validationRules.filter(x => !!x.path));
         }
     }
 }
 
-(function(fn)
+(function (fn)
 {
     var validationModelKey = 'higgs.validationModel';
     var validatedModelKey = 'higgs.validatedModel';
 
     function validationRuleArray()
     {
-        
+
     }
 
     validationRuleArray.prototype = Array.prototype;
 
     Higgs['ValidationRuleArray'] = validationRuleArray;
     fn._serialize = fn.serialize;
-    
-    fn.serialize = function(options: any): any
+
+    fn.serialize = function (options: any): any
     {
         // Use jQuery serializer if there is not parameter.
         if (arguments.length === 0 || options === false) return fn._serialize.apply(this);
-        
+
         var settings = <Higgs.SerializeOptions>(typeof options === 'object' ? $.extend(true, {}, Higgs.SerializeOptions.defaultValue, options) : $.extend(true, {}, Higgs.SerializeOptions.defaultValue));
 
         if (this.length === 1) return serialize.call(this, settings);
 
         var result = [];
-        $(this).each(function()
+        $(this).each(function ()
         {
             var model = serialize.call(this, settings);
 
@@ -705,15 +857,42 @@ module Higgs
         controls
             .filter(':visible,input[type=hidden]')
             .not(':disabled,button')
-            .each(function()
+            .each(function ()
             {
                 if (!this.name) return;
 
-                var value = $(this).value();
+                var el = $(this);
+                var value = el.value();
 
-                if (!settings.ignoreEmptyValue || value !== '') $.setObject(this.name, value, result);
+                if (settings.ignoreEmptyValue && (value === '' || value === null)) return;
+
+                var cValue = $.getObject(this.name, undefined, result);
+
+                if (el.is(':radio'))
+                {
+                    if (value)
+                    {
+                        $.setObject(this.name, value, result);
+                    }
+                }
+                else if (cValue !== undefined)
+                {
+                    if ($.isArray(cValue))
+                    {
+                        var cArray = <Array<any>>cValue;
+                        cArray.push(value);
+                    }
+                    else
+                    {
+                        $.setObject(this.name, [cValue, value], result);
+                    }
+                }
+                else
+                {
+                    $.setObject(this.name, value, result);
+                }
             });
-        
+
         return result;
     }
 
@@ -722,7 +901,7 @@ module Higgs
         var container = $(this);
         var inputs = $(':input', container).not('button');
 
-        for(var i = 0; i < inputs.length; i++)
+        for (var i = 0; i < inputs.length; i++)
         {
             var el = $(inputs[i]);
             var name = el.attr('name');
@@ -731,7 +910,8 @@ module Higgs
 
             var value = $.getObject(name, undefined, data);
 
-            if (value !== undefined) {
+            if (value !== undefined)
+            {
                 el.value(value).trigger('deserialize', data).trigger('change');
             }
         }
@@ -743,7 +923,7 @@ module Higgs
     {
         for (var key in obj)
         {
-            if(!obj.hasOwnProperty(key)) continue;
+            if (!obj.hasOwnProperty(key)) continue;
 
             if (typeof obj[key] === 'object')
             {
@@ -759,7 +939,7 @@ module Higgs
         }
     }
 
-    fn.getValidationModel = function(modelData?: Object)
+    fn.getValidationModel = function (modelData?: Object)
     {
         var x = $(this);
         var controls;
@@ -783,7 +963,7 @@ module Higgs
 
         var elementValidations = Higgs.Rules.getElementValidation();
         var propertyValidationDatas = Higgs.Rules.getPropertyValidationData();
-        
+
         // Get all element-based rules.
         controls
             .not('button')
@@ -800,7 +980,7 @@ module Higgs
                     var ruleFn = rule.validation;
                     var createRuleObjFn = <Function>ruleFn['create'];
 
-                    if(!createRuleObjFn) continue;
+                    if (!createRuleObjFn) continue;
 
                     // create rule instance from DOM
                     var ruleObj = <Higgs.AbstructValidation>createRuleObjFn(el, elData);
@@ -838,7 +1018,7 @@ module Higgs
             var ruleData = propertyValidationDatas[i];
             var list = $.getObject(ruleData.path, undefined, result);
 
-            if(ruleData.modelType && !(modelData instanceof ruleData.modelType)) continue;
+            if (ruleData.modelType && !(modelData instanceof ruleData.modelType)) continue;
 
             if (!list)
             {
@@ -854,17 +1034,17 @@ module Higgs
         return result;
     };
 
-    fn.validateModel = function(options?: Higgs.ValidateOptions)
+    fn.validateModel = function (options?: Higgs.ValidateOptions)
     {
         var container = $(this);
         options = options || $.extend(true, {}, Higgs.ValidateOptions.defaultValue);
         options.validationContainer = container;
-        
+
         if (container.is('form') && (this.noValidate || options.ignoreValidation)) return true;
-        
+
         var obj = container.serialize(true);
         container.data(validatedModelKey, obj);
-        
+
         var validationModel;
 
         if (options.cacheValidationObject)
@@ -887,14 +1067,14 @@ module Higgs
         return result;
     };
 
-    fn.validateModel.test = function(validationModel: Object, options: Higgs.ValidateOptions, obj: Object, path: string)
+    fn.validateModel.test = function (validationModel: Object, options: Higgs.ValidateOptions, obj: Object, path: string)
     {
         var resultList = <Array<Higgs.ValidationResult>>[];
         obj = obj || {};
 
         for (var name in validationModel)
         {
-            if(!validationModel.hasOwnProperty(name)) continue;
+            if (!validationModel.hasOwnProperty(name)) continue;
 
             var cPath = (path ? path + '.' : '') + name;
 
@@ -911,8 +1091,8 @@ module Higgs
                     if (!result)
                     {
                         resultList.push(new Higgs.ValidationResult(rules[i], context, cPath, value));
-                        
-                        if(options.stopOnFirstInvalid) break;
+
+                        if (options.stopOnFirstInvalid) break;
                     }
                 }
             }
@@ -926,14 +1106,14 @@ module Higgs
         return resultList;
     };
 
-    fn.invalidateValidateCache = function()
+    fn.invalidateValidateCache = function ()
     {
         $(this).data(validationModelKey, null);
 
         return this;
     };
 
-    fn.getValidatedModel = function()
+    fn.getValidatedModel = function ()
     {
         return $(this).data(validatedModelKey);
     };
@@ -951,7 +1131,7 @@ module Higgs.Rules
         value: any = undefined;
     };
 
-    export class RequiredValidation extends  Higgs.AbstructValidation
+    export class RequiredValidation extends Higgs.AbstructValidation
     {
         isRequired: boolean = true;
         fieldDependency: Object = null;
@@ -995,7 +1175,7 @@ module Higgs.Rules
         loadDependencyFromString(dependency: string)
         {
             var fields = (<string>dependency).split(',');
-            
+
             this.loadDependencyFromStringArray(fields);
         }
 
@@ -1026,7 +1206,7 @@ module Higgs.Rules
                         fieldName = fieldName.substring(0, index);
                     }
                 }
-                    
+
                 this.fieldDependency[fieldName] = fieldOption;
             }
         }
@@ -1041,7 +1221,7 @@ module Higgs.Rules
                 if (!this.fieldDependency.hasOwnProperty(name)) continue;
 
                 var fieldOption = <FieldDependencyOption>this.fieldDependency[name];
-                
+
                 if (!fieldOption.hasValue)
                 {
                     if (!Higgs.isEmpty(context.parent[name])) return true;
@@ -1050,37 +1230,38 @@ module Higgs.Rules
                 {
                     if (fieldOption.value === undefined)
                     {
+                        if (context.parent[name] === false) return true;
                         if (Higgs.isEmpty(context.parent[name])) return true;
                     }
-                    else if(fieldOption.value !== context.parent[name])
+                    else if (fieldOption.value !== context.parent[name])
                     {
                         return true;
                     }
                 }
             }
-            
+
             return !Higgs.isEmpty(value);
         }
 
-        message(context: Higgs.ValidateContext<Object>, value: any) : string
+        message(context: Higgs.ValidateContext<Object>, value: any): string
         {
-            return 'กรุณาระบุข้อมูล';
+            return Higgs.locale.rules.requiredValidation.apply(this, arguments);
         }
-        
+
         orderIndex: number = 10;
 
-        static create(el: HTMLInputElement, data: { required: any }) : Higgs.AbstructValidation
+        static create(el: HTMLInputElement, data: { required: any }): Higgs.AbstructValidation
         {
             var required = data.required || $(el).attr('required');
 
             if (!required) return null;
             if (required === 'required') required = true; // Case when set data-required="required" should create same validation as required="required"
-            
+
             return new RequiredValidation(required);
         }
     }
 
-    export class StringLengthValidation extends  Higgs.AbstructValidation
+    export class StringLengthValidation extends Higgs.AbstructValidation
     {
         minLength: number = null;
         maxLength: number = null;
@@ -1121,35 +1302,34 @@ module Higgs.Rules
                 return false;
             }
 
-            return  true;
+            return true;
         }
 
-        message(context: Higgs.ValidateContext<Object>, value: any) : string
+        message(context: Higgs.ValidateContext<Object>, value: any): string
         {
-            if(this.minLength === null) return 'ข้อมูลต้องมีความยาวไม่เกิน ' + this.maxLength + ' ตัวอักษร';
-            if(this.maxLength === null) return 'ข้อมูลต้องมีความยาวอย่างน้อย ' + this.minLength + ' ตัวอักษร';
+            if (this.minLength === null) return Higgs.locale.rules.stringLengthValidation_NullMinLength.apply(this, arguments);
+            if (this.maxLength === null) return Higgs.locale.rules.stringLengthValidation_NullMaxLength.apply(this, arguments);
 
-            // TODO: Use format
-            return 'ข้อมูลต้องมีความยาวระหว่าง ' + this.minLength + '-' + this.maxLength + ' ตัวอักษร';
+            return Higgs.locale.rules.stringLengthValidation.apply(this, arguments);
         }
-        
+
         orderIndex: number = 20;
 
-        static create(el: HTMLInputElement, data: { minLength?: number; maxLength?: number }) : Higgs.AbstructValidation
+        static create(el: HTMLInputElement, data: { minLength?: number; maxLength?: number }): Higgs.AbstructValidation
         {
             var minLength = data.minLength;
             var maxLength = el.maxLength < 50000 ? el.maxLength : 0 || data.maxLength;  // prevent max-length default value.
 
             if (!minLength && !maxLength) return null;
-            
+
             // Firefox default max & min length value.
             if (maxLength === -1 && !minLength) return null;
 
             return new StringLengthValidation(minLength, maxLength);
         }
     }
-    
-    export class PatternValidation extends  Higgs.AbstructValidation
+
+    export class PatternValidation extends Higgs.AbstructValidation
     {
         pattern: RegExp = null;
 
@@ -1174,7 +1354,7 @@ module Higgs.Rules
             if (value === undefined) return true;
 
             var text = <string>value;
-            
+
             if (this.pattern === null) return true;
 
             this.pattern.lastIndex = 0;
@@ -1182,14 +1362,14 @@ module Higgs.Rules
             return this.pattern.test(text);
         }
 
-        message(context: Higgs.ValidateContext<Object>, value: any) : string
+        message(context: Higgs.ValidateContext<Object>, value: any): string
         {
-            return 'รูปแบบข้อมูลไม่ถูกต้อง';
+            return Higgs.locale.rules.patternValidation.apply(this, arguments);
         }
-        
+
         orderIndex: number = 50;
 
-        static create(el: HTMLInputElement, data: { pattern?: string }) : Higgs.AbstructValidation
+        static create(el: HTMLInputElement, data: { pattern?: string }): Higgs.AbstructValidation
         {
             var pattern = el.pattern || data.pattern;
 
@@ -1199,28 +1379,28 @@ module Higgs.Rules
         }
     }
 
-    export class NumberValidation extends  PatternValidation
+    export class NumberValidation extends PatternValidation
     {
         constructor(isFloat?: boolean)
         {
             super(isFloat ? /^\d+(.\d+)?$/ : /^\d+$/);
         }
 
-        message(context: Higgs.ValidateContext<Object>, value: any) : string
+        message(context: Higgs.ValidateContext<Object>, value: any): string
         {
             if (this.isInteger)
             {
-                return 'ข้อมูลต้องเป็นตัวเลขจำนวนเต็มเท่านั้น';
+                return Higgs.locale.rules.numberValidation_Integer.apply(this, arguments);
             }
-
-            return 'ข้อมูลต้องเป็นตัวเลขเท่านั้น';
+            
+            return Higgs.locale.rules.numberValidation_Decimal.apply(this, arguments);
         }
-        
+
         orderIndex: number = 30;
         isDecimal: boolean;
         isInteger: boolean;
 
-        static create(el: HTMLInputElement, data: { decimal?: boolean; 'integer'?: boolean }) : Higgs.AbstructValidation
+        static create(el: HTMLInputElement, data: { decimal?: boolean; 'integer'?: boolean }): Higgs.AbstructValidation
         {
             var validation = null;
 
@@ -1229,7 +1409,7 @@ module Higgs.Rules
                 validation = new NumberValidation(true);
                 validation.isDecimal = true;
             }
-            else if(!!data['integer'])
+            else if (!!data['integer'])
             {
                 validation = new NumberValidation(false);
                 validation.isInteger = true;
@@ -1239,7 +1419,7 @@ module Higgs.Rules
         }
     }
 
-    export class UrlValidation extends  PatternValidation
+    export class UrlValidation extends PatternValidation
     {
         constructor()
         {
@@ -1252,51 +1432,51 @@ module Higgs.Rules
             // More Info: http://mathiasbynens.be/demo/url-regex
 
             var regex = new RegExp(
-              "^" +
+                "^" +
                 // protocol identifier
                 "(?:(?:https?|ftp)://)" +
                 // user:pass authentication
                 "(?:\\S+(?::\\S*)?@)?" +
                 "(?:" +
-                  // IP address exclusion
-                  // private & local networks
-                  "(?!(?:10|127)(?:\\.\\d{1,3}){3})" +
-                  "(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})" +
-                  "(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})" +
-                  // IP address dotted notation octets
-                  // excludes loopback network 0.0.0.0
-                  // excludes reserved space >= 224.0.0.0
-                  // excludes network & broacast addresses
-                  // (first & last IP address of each class)
-                  "(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])" +
-                  "(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}" +
-                  "(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))" +
+                // IP address exclusion
+                // private & local networks
+                "(?!(?:10|127)(?:\\.\\d{1,3}){3})" +
+                "(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})" +
+                "(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})" +
+                // IP address dotted notation octets
+                // excludes loopback network 0.0.0.0
+                // excludes reserved space >= 224.0.0.0
+                // excludes network & broacast addresses
+                // (first & last IP address of each class)
+                "(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])" +
+                "(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}" +
+                "(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))" +
                 "|" +
-                  // host name
-                  "(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)" +
-                  // domain name
-                  "(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*" +
-                  // TLD identifier
-                  "(?:\\.(?:[a-z\\u00a1-\\uffff]{2,}))" +
+                // host name
+                "(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)" +
+                // domain name
+                "(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*" +
+                // TLD identifier
+                "(?:\\.(?:[a-z\\u00a1-\\uffff]{2,}))" +
                 ")" +
                 // port number
                 "(?::\\d{2,5})?" +
                 // resource path
                 "(?:/[^\\s]*)?" +
-              "$", "i"
-            );
+                "$", "i"
+                );
 
             return regex;
         }
 
-        message(context: Higgs.ValidateContext<Object>, value: any) : string
+        message(context: Higgs.ValidateContext<Object>, value: any): string
         {
-            return 'ข้อมูลต้องเป็น Url ที่ถูกต้อง';
+            return Higgs.locale.rules.urlValidation.apply(this, arguments);
         }
-        
+
         orderIndex: number = 30;
 
-        static create(el: HTMLInputElement, data: { url: boolean }) : Higgs.AbstructValidation
+        static create(el: HTMLInputElement, data: { url: boolean }): Higgs.AbstructValidation
         {
             var validation = null;
 
@@ -1309,7 +1489,7 @@ module Higgs.Rules
         }
     }
 
-    export class EmailValidation extends  PatternValidation
+    export class EmailValidation extends PatternValidation
     {
         constructor()
         {
@@ -1324,14 +1504,14 @@ module Higgs.Rules
             return regex;
         }
 
-        message(context: Higgs.ValidateContext<Object>, value: any) : string
+        message(context: Higgs.ValidateContext<Object>, value: any): string
         {
-            return 'ข้อมูลต้องเป็น e-mail ที่ถูกต้อง';
+            return Higgs.locale.rules.emailValidation.apply(this, arguments);
         }
-        
+
         orderIndex: number = 30;
 
-        static create(el: HTMLInputElement, data: { email: boolean }) : Higgs.AbstructValidation
+        static create(el: HTMLInputElement, data: { email: boolean }): Higgs.AbstructValidation
         {
             var validation = null;
 
@@ -1343,7 +1523,7 @@ module Higgs.Rules
             return validation;
         }
     }
-    
+
     export class MoreThanValidation extends Higgs.AbstructValidation
     {
         constructor(moreThan: number)
@@ -1360,15 +1540,15 @@ module Higgs.Rules
             return this.value < parseFloat(value + '');
         }
 
-        message(context: Higgs.ValidateContext<Object>, value: any) : string
+        message(context: Higgs.ValidateContext<Object>, value: any): string
         {
-            return 'ข้อมูลต้องมีค่ามากกว่า ' + this.value;
+            return Higgs.locale.rules.moreThanValidation.apply(this, arguments);
         }
-        
+
         orderIndex: number = 40;
         value: number;
 
-        static create(el: HTMLInputElement, data: { moreThan: number }) : Higgs.AbstructValidation
+        static create(el: HTMLInputElement, data: { moreThan: number }): Higgs.AbstructValidation
         {
             if (data.moreThan === undefined) return null;
 
@@ -1394,15 +1574,15 @@ module Higgs.Rules
             return this.value <= parseFloat(value + '');
         }
 
-        message(context: Higgs.ValidateContext<Object>, value: any) : string
+        message(context: Higgs.ValidateContext<Object>, value: any): string
         {
-            return 'ข้อมูลต้องมีค่ามากกว่าเท่ากับ ' + this.value;
+            return Higgs.locale.rules.minValidation.apply(this, arguments);
         }
 
         orderIndex: number = 41;
         value: number;
 
-        static create(el: HTMLInputElement, data: { min: number }) : Higgs.AbstructValidation
+        static create(el: HTMLInputElement, data: { min: number }): Higgs.AbstructValidation
         {
             var min = null;
 
@@ -1415,7 +1595,7 @@ module Higgs.Rules
             return validation;
         }
     }
-    
+
     export class LessThanValidation extends Higgs.AbstructValidation
     {
         constructor(lessThan: number)
@@ -1432,15 +1612,15 @@ module Higgs.Rules
             return this.value > parseFloat(value + '');
         }
 
-        message(context: Higgs.ValidateContext<Object>, value: any) : string
+        message(context: Higgs.ValidateContext<Object>, value: any): string
         {
-            return 'ข้อมูลต้องมีค่าน้อยกว่า ' + this.value;
+            return Higgs.locale.rules.lessThanValidation.apply(this, arguments);
         }
-        
+
         orderIndex: number = 42;
         value: number;
 
-        static create(el: HTMLInputElement, data: { lessThan: number }) : Higgs.AbstructValidation
+        static create(el: HTMLInputElement, data: { lessThan: number }): Higgs.AbstructValidation
         {
             if (data.lessThan === undefined) return null;
 
@@ -1466,15 +1646,15 @@ module Higgs.Rules
             return this.value >= parseFloat(value + '');
         }
 
-        message(context: Higgs.ValidateContext<Object>, value: any) : string
+        message(context: Higgs.ValidateContext<Object>, value: any): string
         {
-            return 'ข้อมูลต้องมีค่าน้อยกว่าหรือเท่ากับ ' + this.value;
+            return Higgs.locale.rules.maxValidation.apply(this, arguments);
         }
-        
+
         orderIndex: number = 43;
         value: number;
 
-        static create(el: HTMLInputElement, data: { max: number }) : Higgs.AbstructValidation
+        static create(el: HTMLInputElement, data: { max: number }): Higgs.AbstructValidation
         {
             var max = null;
 
@@ -1487,15 +1667,15 @@ module Higgs.Rules
             return validation;
         }
     }
-    
-    export class EqualValidation extends  Higgs.AbstructValidation
+
+    export class EqualValidation extends Higgs.AbstructValidation
     {
         equalProperty: string = null;
 
         constructor(propertyName: string)
         {
             super(propertyName);
-            
+
             this.equalProperty = propertyName;
         }
 
@@ -1506,14 +1686,14 @@ module Higgs.Rules
             return context.parent[this.equalProperty] === value;
         }
 
-        message(context: Higgs.ValidateContext<Object>, value: any) : string
+        message(context: Higgs.ValidateContext<Object>, value: any): string
         {
-            return 'ข้อมูลต้องมีค่าเท่ากับ {label:' + this.equalProperty + '}';
+            return Higgs.locale.rules.equalValidation.apply(this, arguments);
         }
-        
+
         orderIndex: number = 60;
 
-        static create(el: HTMLInputElement, data: { equal?: string }) : Higgs.AbstructValidation
+        static create(el: HTMLInputElement, data: { equal?: string }): Higgs.AbstructValidation
         {
             var propertyName = data.equal;
 
@@ -1522,15 +1702,15 @@ module Higgs.Rules
             return new EqualValidation(propertyName);
         }
     }
-    
-    export class NotEqualValidation extends  Higgs.AbstructValidation
+
+    export class NotEqualValidation extends Higgs.AbstructValidation
     {
         notEqualProperty: string = null;
 
         constructor(propertyName: string)
         {
             super(propertyName);
-            
+
             this.notEqualProperty = propertyName;
         }
 
@@ -1541,14 +1721,14 @@ module Higgs.Rules
             return context.parent[this.notEqualProperty] !== value;
         }
 
-        message(context: Higgs.ValidateContext<Object>, value: any) : string
+        message(context: Higgs.ValidateContext<Object>, value: any): string
         {
-            return 'ข้อมูลต้องมีค่าไม่เท่ากับ {label:' + this.notEqualProperty + '}';
+            return Higgs.locale.rules.notEqualValidation.apply(this, arguments);
         }
-        
+
         orderIndex: number = 60;
 
-        static create(el: HTMLInputElement, data: { notEqual?: string }) : Higgs.AbstructValidation
+        static create(el: HTMLInputElement, data: { notEqual?: string }): Higgs.AbstructValidation
         {
             var propertyName = data.notEqual;
 
@@ -1561,7 +1741,7 @@ module Higgs.Rules
     // Auto register all validation
     for (var key in Higgs.Rules)
     {
-        if(!Higgs.Rules.hasOwnProperty(key)) continue;
+        if (!Higgs.Rules.hasOwnProperty(key)) continue;
 
         var fieldName = <string>key;
 
@@ -1576,7 +1756,7 @@ module Higgs.Rules
 interface JQuery
 {
     redraw(): JQuery;
-    validate(options?: Higgs.ValidateOptions) : boolean;
+    validate(options?: Higgs.ValidateOptions): boolean;
     clearValidationResult();
     displayValidationResult(result: Array<Higgs.ValidationResult>, options?: Higgs.ValidateOptions): boolean;
     disableHtml5Validation(): JQuery;
@@ -1587,7 +1767,7 @@ module Higgs
     export var validationErrorClass: string = 'glyphicon-exclamation-sign';
 }
 
-(function(fn)
+(function (fn)
 {
     var popoverContainerId = 'popover_validationError';
     var popover;
@@ -1595,13 +1775,17 @@ module Higgs
     var focusEvent = 'focus.validationResult.popover';
     var blurEvent = 'blur.validationResult.popover';
 
-    fn.redraw = function() {
-      return $(this).each(function(){
-        var redraw = this.offsetHeight;
-      });
+    fn.redraw = function ()
+    {
+        return $(this).each(function ()
+        {
+            var redraw = this.offsetHeight;
+
+            return redraw;
+        });
     };
 
-    fn.clearValidationResult = function()
+    fn.clearValidationResult = function ()
     {
         var container = $(this);
 
@@ -1612,12 +1796,12 @@ module Higgs
         $(':input', container).unbind('*.validationResult.popover');
     }
 
-    fn.displayValidationResult = function(result: Array<Higgs.ValidationResult>, options?: Higgs.ValidateOptions)
+    fn.displayValidationResult = function (result: Array<Higgs.ValidationResult>, options?: Higgs.ValidateOptions)
     {
         var container = $(this);
         options = options || $.extend(true, {}, Higgs.ValidateOptions.defaultValue);
         container.clearValidationResult();
-        
+
         var inputs = $('.form-group :input', container);
         inputs.off('.validationResult');
         var isValid = true;
@@ -1627,7 +1811,7 @@ module Higgs
             var cResult = result[i];
             var input = inputs.filter('[name=' + cResult.path + ']:visible');
 
-            if(input.length === 0) continue;
+            if (input.length === 0) continue;
 
             isValid = false;
             var inputContainer = input.parents('[class^=col-]:first,.form-group:first').first();
@@ -1643,7 +1827,7 @@ module Higgs
                 {
                     var rightMargin = 0;
                     var nextControls = input.nextAll(':visible');
-                    nextControls.each((index:number, el:Element) =>
+                    nextControls.each((index: number, el: Element) =>
                     {
                         rightMargin += $(el).outerWidth(true);
                     });
@@ -1651,15 +1835,20 @@ module Higgs
                     if (rightMargin > 0)
                     {
                         feedback.css
-                        ({
-                            top: 0,
-                            right: (rightMargin + 1) + 'px',
-                            zIndex: 10
-                        });
+                            ({
+                                top: 0,
+                                right: (rightMargin + 1) + 'px',
+                                zIndex: 10
+                            });
                     }
                 }
 
                 feedback.insertAfter(input);
+                feedback.on('click', input, e =>
+                {
+                    var control = <JQuery>e.data;
+                    control.focus();
+                });
 
                 if (options.enableFadeInFeedback)
                 {
@@ -1675,12 +1864,16 @@ module Higgs
             input.on(focusEvent, <string>null, <Object>cResult, onFocusInvalidInput);
             if (input.is(':focus')) input.trigger('focus');
 
-            input.on(blurEvent, () =>
+            var hidePopupFn = () =>
             {
                 if (!popover || !popover.modalPopover) return;
 
                 popover.modalPopover('hide');
-            });
+
+                // TODO: find out the better way to hide modal popover
+                popover.remove();
+            };
+            input.on(blurEvent, hidePopupFn);
         }
 
         return isValid;
@@ -1696,9 +1889,9 @@ module Higgs
             popover.modalPopover('hide');
             popover.remove();
         }
-        
+
         fn.displayValidationResult.createPopover();
-        
+
         $('<p/>')
             .text(getErrorMessage(result))
             .appendTo(popoverContent);
@@ -1716,7 +1909,7 @@ module Higgs
     function getErrorMessage(result: Higgs.ValidationResult): string
     {
         var variableRegex = /\{([^\}:]+)(:([^\}]+))?\}/g;
-        
+
         var match = variableRegex.exec(result.message);
         while (match != null)
         {
@@ -1746,7 +1939,7 @@ module Higgs
         return result.message;
     }
 
-    fn.displayValidationResult.createPopover = function()
+    fn.displayValidationResult.createPopover = function ()
     {
         popover = $('<div id="dialog" class="popover" />').attr('id', popoverContainerId);
         popover.append($('<div class="arrow" />'));
@@ -1756,11 +1949,11 @@ module Higgs
         popover.appendTo(document.body);
     };
 
-    fn.validate = function(options?: Higgs.ValidateOptions): boolean
+    fn.validate = function (options?: Higgs.ValidateOptions): boolean
     {
         var isTotalValid = true;
 
-        $.each(this, function()
+        $.each(this, function ()
         {
             var container = $(this);
             options = options || $.extend(true, {}, Higgs.ValidateOptions.defaultValue);
@@ -1773,7 +1966,7 @@ module Higgs
             container.off('.higgs.revalidate');
             if (!isValid)
             {
-                container.on('blur.higgs.revalidate change.higgs.revalidate', '.has-error :input', options, function(e: JQueryEventObject)
+                container.on('blur.higgs.revalidate change.higgs.revalidate', '.has-error :input', options, function (e: JQueryEventObject)
                 {
                     if (popover) popover.remove();
 
@@ -1791,9 +1984,9 @@ module Higgs
     };
 
     // Disable HTML5 form validation
-    fn.disableHtml5Validation = function()
+    fn.disableHtml5Validation = function ()
     {
-        $(':input', this).on('invalid', function(e:JQueryEventObject)
+        $(':input', this).on('invalid', function (e: JQueryEventObject)
         {
             e.stopPropagation();
 
@@ -1806,7 +1999,7 @@ module Higgs
 
 module Higgs 
 {
-    export function convertToValidationResult(response: Higgs.AjaxResult) : Array<Higgs.ValidationResult>
+    export function convertToValidationResult(response: Higgs.AjaxResult): Array<Higgs.ValidationResult>
     {
         var result = <Array<Higgs.ValidationResult>>[];
 
@@ -1814,12 +2007,12 @@ module Higgs
         {
             for (var key in response.errorList)
             {
-                if(!response.errorList.hasOwnProperty(key)) continue;
-                if(key === 'custom-error') continue;
+                if (!response.errorList.hasOwnProperty(key)) continue;
+                if (key === 'custom-error') continue;
 
                 var messages = response.errorList[key];
 
-                if(!messages) continue;
+                if (!messages) continue;
                 for (var i = 0; i < messages.length; i++)
                 {
                     result.push(new Higgs.ValidationResult(key, messages[i]));
@@ -1828,7 +2021,7 @@ module Higgs
         }
 
         return result;
-    }    
+    }
 }
 
 //#endregion
