@@ -78,6 +78,14 @@ namespace Higgs.WebOptimizer
                 foreach (Match m in scriptResults)
                 {
                     var logicalOutputPath = m.Groups[3].Value;
+
+                    // Prevent ?query suffix
+                    if (!logicalOutputPath.EndsWith("." + extension, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        var extensionLength = ("." + extension).Length;
+                        logicalOutputPath = logicalOutputPath.Substring(0, logicalOutputPath.LastIndexOf("." + extension, StringComparison.CurrentCultureIgnoreCase) + extensionLength);
+                    }
+
                     var outputFileFullName = IOHelpers.GetFullPath(logicalOutputPath, workingDir);
                     var outputFile = IOHelpers.GetRelativePath(workingDir, outputFileFullName);
                     var inputFileList = new List<string>();
