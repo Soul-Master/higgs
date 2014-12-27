@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Linq.Expressions;
 
@@ -48,6 +50,22 @@ namespace Higgs.Core.Helpers
             var methodCallExp = exp.Body as MethodCallExpression;
 
             return methodCallExp == null ? null : methodCallExp.Method;
+        }
+
+        public static Assembly GetCallerAssembly(this Assembly currentAssembly)
+        {
+            var frames = new StackTrace().GetFrames();
+
+            if (frames == null) return null;
+            frames = frames.Skip(1).ToArray();
+
+            return 
+            (
+                from f in frames 
+                select f.GetMethod() into method
+                where method != null && method.ReflectedType != null
+                select method.ReflectedType.Assembly
+            ).FirstOrDefault(ass => ass != currentAssembly);
         }
     }
 }

@@ -76,6 +76,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\..\CBSPayment\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
@@ -89,6 +93,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -118,6 +123,7 @@
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Common\GlobalAssemblyInfo.cs">
@@ -129,6 +135,11 @@
     <Compile Include="Attributes\NoCacheAttribute.cs" />
     <Compile Include="Attributes\WaitAttribute.cs" />
     <Compile Include="BooleanModelBinder.cs" />
+    <Compile Include="Helpers\DataTablesHelpers.cs" />
+    <Compile Include="Helpers\ExcelHelpers.cs" />
+    <Compile Include="Helpers\Select2Helpers.cs" />
+    <Compile Include="OpenXml\ExcelDocument.cs" />
+    <Compile Include="OpenXml\SpreadsheetHelper.cs" />
     <Compile Include="TrimStringBinder.cs" />
     <Compile Include="JsonNetResult.cs" />
     <Compile Include="Helpers\PageHelper.cs" />
