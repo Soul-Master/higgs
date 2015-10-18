@@ -1,21 +1,29 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Web.Mvc;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Higgs.OpenXml;
+using Newtonsoft.Json;
 
 namespace Higgs.Web.Helpers
 {
     public static class DataTablesHelpers
     {
-        public static ActionResult ToDataTableResult<T>(this IQueryable<T> list, DataTablesRequestModel model, object additionalData = null, ExportFooter exportFooter = null)
+        public static ActionResult ToDataTableResult<T>(this IQueryable<T> list, DataTablesRequestModel model, object additionalData = null, ExportFooter exportFooter = null, Action<List<T>, int> resultCallback = null)
             where T : class
         {
             var recordsTotal = list.Count();
+
             if (recordsTotal == 0)
             {
+                if (resultCallback != null) resultCallback(null, recordsTotal);
+
                 return new JsonNetResult(HiggsResult.SerializerSettings)
                 {
                     Data = new DataTablesResponseModel(model.Draw, new String[] { }, 0, 0)
@@ -31,34 +39,37 @@ namespace Higgs.Web.Helpers
                 var terms = filterRegex.Matches(model.Search.Value);
                 var keywords = new object[terms.Count];
 
-                for (var i = 0; i < terms.Count; i++)
+                if (terms.Count > 0)
                 {
-                    if (filter.Length > 0) filter += " AND ";
-
-                    filter += "( ";
-                    var isFirst = true;
-
-                    for (var j = 0; j < model.Columns.Count; j++)
+                    for (var i = 0; i < terms.Count; i++)
                     {
-                        var col = model.Columns[j];
+                        if (filter.Length > 0) filter += " AND ";
 
-                        if (!col.Searchable) continue;
-                        if (string.IsNullOrEmpty(col.Data)) continue;
-                        if (regexInt.IsMatch(col.Data)) continue;
+                        filter += "( ";
+                        var isFirst = true;
 
-                        if (!isFirst) filter += " OR ";
-                        else isFirst = false;
+                        for (var j = 0; j < model.Columns.Count; j++)
+                        {
+                            var col = model.Columns[j];
 
-                        col.Data = col.Data.Substring(0, 1) + col.Data.Substring(1);
-                        filter += col.Data + ".ToString().Contains(@" + i + ")";
+                            if (!col.Searchable) continue;
+                            if (string.IsNullOrEmpty(col.Data)) continue;
+                            if (regexInt.IsMatch(col.Data)) continue;
+
+                            if (!isFirst) filter += " OR ";
+                            else isFirst = false;
+
+                            var propertyName = col.Data.Substring(0, 1).ToUpper() + col.Data.Substring(1);
+                            filter += propertyName + ".ToString().Contains(@" + i + ")";
+                        }
+
+                        var condition = terms[i].Groups[3].Success ? terms[i].Groups[3].Value : terms[i].Groups[4].Value;
+                        keywords[i] = condition;
+                        filter += " )";
                     }
 
-                    var condition = terms[i].Groups[3].Success ? terms[i].Groups[3].Value : terms[i].Groups[4].Value;
-                    keywords[i] = condition;
-                    filter += " )";
+                    list = list.Where(filter, keywords);
                 }
-
-                if (terms.Count > 0) list = list.Where(filter, keywords);
             }
 
             // Order
@@ -93,7 +104,9 @@ namespace Higgs.Web.Helpers
                 return fileStreamResult;
             }
 
-            var result = list.Skip(model.Start).Take(model.Length == -1 ? int.MaxValue : model.Length);
+            var result = list.Skip(model.Start).Take(model.Length == -1 ? int.MaxValue : model.Length).ToList();
+
+            if (resultCallback != null) resultCallback(result, recordsTotal);
 
             return new JsonNetResult(HiggsResult.SerializerSettings)
             {
@@ -102,6 +115,229 @@ namespace Higgs.Web.Helpers
                     AdditionalData = additionalData
                 }
             };
+        }
+
+        public static Stream CreateExcelReport<T>(this List<T> data, DataTablesRequestModel model, ExportFooter footer = null)
+            where T : class
+        {
+            #region Create Document
+
+            var doc = new ExcelDocument();
+            var sheet = doc.AddSheet();
+
+            #endregion
+
+            #region Add Title
+
+            var row = sheet.AddRow();
+            sheet.AddCell(row, DefaultCellFormats.BoldUnderlineCenter)
+                .SetValueInlineString(model.ReportTitle);
+            sheet.MergeCell(row, 1, model.Columns.Count);
+            sheet.AddRow();     // Separate Row
+
+            #endregion
+
+            #region Add Header
+
+            var header1 = sheet.AddRow();
+            var header2 = sheet.AddRow(false);
+            var hasSubColumn = model.Columns.Any(x => x.ExportColSpan > 1);
+            var colSpan = 0;
+
+            for (var i = 0; i < model.Columns.Count; i++)
+            {
+                var col = model.Columns[i];
+
+                if (!col.IsVisible) continue;
+
+                if (col.ExportColSpan == 1 && colSpan == 0)
+                {
+                    var cell1 = sheet.AddCell(header1, DefaultCellFormats.BoldCenterBorder);
+                    cell1.SetValueInlineString(col.ExportTitle);
+
+                    if (hasSubColumn)
+                    {
+                        var cell2 = sheet.AddCell(header2, DefaultCellFormats.BoldCenterBorder);
+
+                        sheet.MergeCell(cell1, cell2);
+                    }
+                }
+                else
+                {
+                    if (col.ExportColSpan > 1)
+                    {
+                        colSpan = col.ExportColSpan;
+
+                        var startCell = sheet.AddCell(header1, DefaultCellFormats.BoldCenterBorder)
+                                                            .SetValueInlineString(col.ExportGroupTitle);
+
+                        Cell endCell = null;
+                        for (var j = i + 1; j < i + colSpan; j++)
+                        {
+                            endCell = sheet.AddCell(header1, DefaultCellFormats.BoldCenterBorder);
+                        }
+
+                        sheet.MergeCell(startCell, endCell);
+                    }
+
+                    sheet.AddCell(header2, DefaultCellFormats.BoldCenterBorder)
+                            .SetValueInlineString(col.ExportTitle);
+
+                    colSpan--;
+                }
+            }
+
+            if (hasSubColumn)
+            {
+                sheet.AppendRow(header2);
+            }
+
+            #endregion
+
+            #region Add Content
+
+            var properties = typeof(T).GetProperties()
+                                                        .Where(x => x.CanRead)
+                                                        .ToDictionary(x => x.Name.ToUpperInvariant(), x => x);
+
+            foreach (var item in data)
+            {
+                row = sheet.AddRow();
+
+                for (var i = 0; i < model.Columns.Count; i++)
+                {
+                    var col = model.Columns[i];
+
+                    // TODO: Test with colspan
+                    if (!col.IsVisible) continue;
+
+                    var cellStyle = col.ExportDataType.ToCellFormat();
+                    var cell = sheet.AddCell(row, cellStyle);
+                    var colName = col.Data.ToUpperInvariant();
+                    var prop = properties[colName];
+                    var itemPropertyValue = prop.GetValue(item);
+
+                    cell.SetValue(itemPropertyValue, prop.PropertyType);
+                }
+            }
+
+            #endregion
+
+            #region Add Footer
+
+            if (footer != null)
+            {
+                row = sheet.AddRow();
+
+                var colIndex = 0;
+                var footerCellIndex = 0;
+                var footerMapping = new Dictionary<int, int>();
+
+                for (var i = 0; i < footer.Cells.Count; i++)
+                {
+                    var cell = footer.Cells[i];
+                    var lastVisibleIndex = (int?)null;
+
+                    for (var j = 0; j < cell.ColSpan; j++)
+                    {
+                        if (model.Columns[footerCellIndex].IsVisible)
+                        {
+                            lastVisibleIndex = footerCellIndex;
+                        }
+
+                        footerCellIndex++;
+                    }
+
+                    if(lastVisibleIndex.HasValue) footerMapping[lastVisibleIndex.Value] = i;
+                }
+
+                for (var i = 0; i < model.Columns.Count; i++)
+                {
+                    var col = model.Columns[i];
+
+                    if (!col.IsVisible)
+                    {
+                        continue;
+                    }
+
+                    colIndex++;
+                    var footerCell = footerMapping.ContainsKey(i) ? footer.Cells[footerMapping[i]] : null;
+                    var cell = sheet.AddCell(row, footerCell != null ? footerCell.CellFormat : DefaultCellFormats.Default);
+
+                    if (footerCell == null) continue;
+                    if (footerCell.Value != null)
+                    {
+                        var type = footerCell.Value.GetType();
+
+                        if (type == typeof(string))
+                        {
+                            cell.SetValueInlineString((string)footerCell.Value);
+                        }
+                        else
+                        {
+                            cell.SetValue(footerCell.Value, type);
+                        }
+                    }
+
+                    var columnName = SpreadsheetHelper.GetColumnName(colIndex);
+                    switch (footerCell.FormulaType)
+                    {
+                        case FormulaType.Sum:
+                            var startIndex = (hasSubColumn ? 5 : 4);
+                            var cellFormula = new CellFormula
+                            {
+                                Text = string.Format("SUM(" + columnName + startIndex + ":" + columnName + (startIndex + data.Count - 1) + ")")
+                            };
+                            var cellValue = new CellValue { Text = "0" };
+
+                            cell.AppendChild(cellFormula);
+                            cell.AppendChild(cellValue);
+                            break;
+                    }
+                }
+            }
+
+            #endregion
+
+            // AutoFit for all column
+            for (uint i = 0; i < model.Columns.Count; i++)
+            {
+                doc.Workbook.AutoFitColumn(sheet, (i + 1));
+            }
+
+            return doc.Save();
+        }
+
+        public static DefaultCellFormats ToCellFormat(this ExportDataType col)
+        {
+            DefaultCellFormats cellStyle;
+
+            switch (col)
+            {
+                case ExportDataType.Integer:
+                    cellStyle = DefaultCellFormats.OutsideBorderInteger;
+                    break;
+                case ExportDataType.Money:
+                    cellStyle = DefaultCellFormats.OutsideBorderMoney;
+                    break;
+                case ExportDataType.Month:
+                    cellStyle = DefaultCellFormats.OutsideBorderMonth;
+                    break;
+                case ExportDataType.Date:
+                    cellStyle = DefaultCellFormats.OutsideBorderDate;
+                    break;
+                case ExportDataType.DateTime:
+                    cellStyle = DefaultCellFormats.OutsideBorderDateTime;
+                    break;
+                case ExportDataType.LongText:
+                    cellStyle = DefaultCellFormats.OutsideBorderLongText;
+                    break;
+                default:
+                    cellStyle = DefaultCellFormats.OutsideBorder;
+                    break;
+            }
+
+            return cellStyle;
         }
     }
 
@@ -118,6 +354,19 @@ namespace Higgs.Web.Helpers
         // For export only
         public bool IsExport { get; set; }
         public string ReportTitle { get; set; }
+    }
+
+    public class DataTableRequestModelBinder : IModelBinder
+    {
+        public object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
+        {
+            var request = controllerContext.RequestContext.HttpContext.Request;
+            var serverParams = request.Form["serverParams"];
+
+            if (string.IsNullOrEmpty(serverParams)) return null;
+
+            return JsonConvert.DeserializeObject<DataTablesRequestModel>(HttpUtility.UrlDecode(serverParams));
+        }
     }
 
     public class ColumnModel
@@ -167,18 +416,13 @@ namespace Higgs.Web.Helpers
     {
         public FooterCell()
         {
-
+            ColSpan = 1;
         }
 
         public object Value { get; set; }
         public FormulaType FormulaType { get; set; }
         public DefaultCellFormats CellFormat { get; set; }
-    }
-
-    public enum FormulaType
-    {
-        None,
-        Sum
+        public int ColSpan { get; set; }
     }
 
     public enum ExportDataType
@@ -188,7 +432,8 @@ namespace Higgs.Web.Helpers
         Money,
         Month,
         Date,
-        DateTime
+        DateTime,
+        LongText
     }
 
     public class DataTablesResponseModel
@@ -208,32 +453,5 @@ namespace Higgs.Web.Helpers
             RecordsFiltered = recordsFiltered;
             RecordsTotal = recordsTotal;
         }
-    }
-
-    public enum DefaultCellFormats : uint
-    {
-        Default = 0U,
-        Bold = 1U,
-        Italic = 2U,
-        Underline = 3U,
-        BoldUnderline = 4U,
-        Center = 5U,
-        Left = 6U,
-        Right = 7U,
-        OutsideBorder = 8U,
-        BoldCenter = 9U,
-        BoldLeft = 10U,
-        BoldRight = 11U,
-        UnderlineCenter = 12U,
-        BoldUnderlineCenter = 13U,
-        BoldCenterBorder = 14U,
-        OutsideBorderDataDate = 15U,
-        OutsideBorderInteger = 16U,
-        OutsideBorderMoney = 17U,
-        OutsideBorderMonth = 18U,
-        OutsideBorderDate = 19U,
-        OutsideBorderDateTime = 20U,
-        BoldUnderlineInteger = 21U,
-        BoldUnderlineMoney = 22U
     }
 }

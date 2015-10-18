@@ -1,11 +1,10 @@
-﻿using System.Web.ModelBinding;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
-namespace Higgs.Web
+namespace Higgs.Web.Binders
 {
-    public class TrimStringBinder : System.Web.ModelBinding.IModelBinder
+    public class TrimStringBinder : IModelBinder
     {
-        public bool BindModel(ModelBindingExecutionContext modelBindingExecutionContext, System.Web.ModelBinding.ModelBindingContext bindingContext)
+        public object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
         {
             var valueResult = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
 

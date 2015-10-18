@@ -5,11 +5,10 @@ using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using Higgs.Web.Helpers;
 using Color = DocumentFormat.OpenXml.Spreadsheet.Color;
 using Font = DocumentFormat.OpenXml.Spreadsheet.Font;
 
-namespace Higgs.Web.OpenXml
+namespace Higgs.OpenXml
 {
     public static class SpreadsheetHelper
     {
@@ -93,7 +92,16 @@ namespace Higgs.Web.OpenXml
                         new DiagonalBorder())
                     ),
                 new CellFormats(
-                    new CellFormat { FontId = 0, FillId = 0, BorderId = 0 },                                      // Index 0 - The default cell style.  If a cell does not have a style index applied it will use this style combination instead
+                    new CellFormat
+                    {
+                        FontId = 0,
+                        FillId = 0,
+                        BorderId = 0,
+                        Alignment = new Alignment
+                        {
+                            Vertical = VerticalAlignmentValues.Center
+                        }
+                    },    // Index 0 - The default cell style.  If a cell does not have a style index applied it will use this style combination instead
                     new CellFormat { FontId = 1, FillId = 0, BorderId = 0, ApplyFont = true },       // Index 1 - Bold 
                     new CellFormat { FontId = 2, FillId = 0, BorderId = 0, ApplyFont = true },       // Index 2 - Italic
                     new CellFormat { FontId = 3, FillId = 0, BorderId = 0, ApplyFont = true },       // Index 3 - Underline
@@ -107,7 +115,12 @@ namespace Higgs.Web.OpenXml
                     new CellFormat(                                                                                                      // Index 7 - Alignment Right
                         new Alignment { Horizontal = HorizontalAlignmentValues.Right, Vertical = VerticalAlignmentValues.Center }
                         ) { FontId = 0, FillId = 0, BorderId = 0, ApplyAlignment = true },
-                    new CellFormat { FontId = 0, FillId = 0, BorderId = 1, ApplyBorder = true },   // Index 8 - Border
+                    new CellFormat { FontId = 0, FillId = 0, BorderId = 1, ApplyBorder = true,
+                        Alignment = new Alignment
+                        {
+                            Vertical = VerticalAlignmentValues.Center
+                        }
+                    },   // Index 8 - Border
                     new CellFormat(                                                                                                      // Index 9 - Bold+Alignment Center
                         new Alignment { Horizontal = HorizontalAlignmentValues.Center, Vertical = VerticalAlignmentValues.Center }
                         ) { FontId = 1, FillId = 0, BorderId = 0, ApplyAlignment = true },
@@ -144,7 +157,12 @@ namespace Higgs.Web.OpenXml
                         new Alignment { Horizontal = HorizontalAlignmentValues.Center, Vertical = VerticalAlignmentValues.Center }
                         ) { FontId = 0, FillId = 0, BorderId = 1, ApplyAlignment = true, NumberFormatId = 2 }, // Index 20 - Border + DateTime
                     new CellFormat { FontId = 4, FillId = 0, BorderId = 0, ApplyFont = true, NumberFormatId = 3 },       // Index 21 - Bold+Underline+Integer
-                    new CellFormat { FontId = 4, FillId = 0, BorderId = 0, ApplyFont = true, NumberFormatId = 4 }       // Index 22 - Bold+Underline+Money
+                    new CellFormat { FontId = 4, FillId = 0, BorderId = 0, ApplyFont = true, NumberFormatId = 4 },       // Index 22 - Bold+Underline+Money
+                    new CellFormat {
+                        FontId = 0,
+                        FillId = 0,
+                        BorderId = 1,
+                        Alignment = new Alignment { Vertical = VerticalAlignmentValues.Top, WrapText = true } }       // Index 23 - Long Text
                     )
                 );
 
@@ -243,7 +261,7 @@ namespace Higgs.Web.OpenXml
             return mergeCells.OfType<MergeCell>().Any(x => IsInRange(x.Reference.Value, cellRef));
         }
 
-        public static Cell AddCell(this Worksheet sheet, Row row, UInt32? styleIndex = null, bool isAppend = true)
+        private static Cell AddCell(this Worksheet sheet, Row row, UInt32? styleIndex = null, bool isAppend = true)
         {
             var cell = new Cell();
             if (styleIndex.HasValue) cell.StyleIndex = styleIndex.Value;
@@ -274,6 +292,11 @@ namespace Higgs.Web.OpenXml
             }
 
             return cell;
+        }
+
+        public static Cell AddCell(this Worksheet sheet, Row row, DefaultCellFormats cellFormat, bool isAppend = true)
+        {
+            return sheet.AddCell(row, (UInt32) cellFormat, isAppend);
         }
 
         public static Cell GetCell(this Worksheet sheet, string cellAddress)
@@ -337,11 +360,6 @@ namespace Higgs.Web.OpenXml
 
             return cellColIndex >= startColIndex && cellRowIndex >= startRowIndex &&
                    cellColIndex <= endColIndex && cellRowIndex <= endRowIndex;
-        }
-
-        public static Cell AddCell(this Worksheet sheet, Row row, DefaultCellFormats style, bool isAppend = true)
-        {
-            return sheet.AddCell(row, (uint)style, isAppend);
         }
 
         public static Row AppendCell(this Row row, Cell cell)

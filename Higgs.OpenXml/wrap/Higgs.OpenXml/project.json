@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "net451": {
+      "wrappedProject": "../../Higgs.OpenXml.csproj",
+      "bin": {
+        "assembly": "../../obj/{configuration}/Higgs.OpenXml.dll",
+        "pdb": "../../obj/{configuration}/Higgs.OpenXml.pdb"
+      },
+      "dependencies": {
+        "DocumentFormat.OpenXml": "2.5",
+        "Higgs.Core": "1.0.0-*"
+      }
+    }
+  }
+}

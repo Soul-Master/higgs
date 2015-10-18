@@ -88,26 +88,26 @@ module Higgs
 
     locales.push
         ({
-            name: 'EN',
-            rules:
-            {
-                requiredValidation: f('Please specify'),
-                stringLengthValidation: f('Data must be between {minLength}-{maxLength} characters in length.'),
-                stringLengthValidation_NullMinLength: f('Data length greater than {maxLength} characters'),
-                stringLengthValidation_NullMaxLength: f('Data length less than {minLength} characters'),
-                patternValidation: f('Data is not in the correct format'),
-                numberValidation_Integer: f('Data is not a valid integer'),
-                numberValidation_Decimal: f('Data is not a valid number'),
-                urlValidation: f('Data is not a valid URL'),
-                emailValidation: f('Data is not a valid email address'),
-                moreThanValidation: f('Data should has value more than {value}'),
-                minValidation: f('Data should has value at least {value}'),
-                lessThanValidation: f('Data should has value less than {value}'),
-                maxValidation: f('Data should has value less than or equal {value}'),
-                equalValidation: f('Data should has value equal to {label:{equalProperty}}'),
-                notEqualValidation: f('Data should has value not equal to {label:{notEqualProperty}}')
-            }
-        });
+        name: 'EN',
+        rules:
+        {
+            requiredValidation: f('Please specify'),
+            stringLengthValidation: f('Data must be between {minLength}-{maxLength} characters in length.'),
+            stringLengthValidation_NullMinLength: f('Data length greater than {maxLength} characters'),
+            stringLengthValidation_NullMaxLength: f('Data length less than {minLength} characters'),
+            patternValidation: f('Data is not in the correct format'),
+            numberValidation_Integer: f('Data is not a valid integer'),
+            numberValidation_Decimal: f('Data is not a valid number'),
+            urlValidation: f('Data is not a valid URL'),
+            emailValidation: f('Data is not a valid email address'),
+            moreThanValidation: f('Data should has value more than {value}'),
+            minValidation: f('Data should has value at least {value}'),
+            lessThanValidation: f('Data should has value less than {value}'),
+            maxValidation: f('Data should has value less than or equal {value}'),
+            equalValidation: f('Data should has value equal to {label:{equalProperty}}'),
+            notEqualValidation: f('Data should has value not equal to {label:{notEqualProperty}}')
+        }
+    });
 })(Higgs.locales);
 
 if (!window['locale'] || (<string>window['locale']).toUpperCase() === 'EN') Higgs.locale = Higgs.locales[Higgs.locales.length - 1];
@@ -143,12 +143,12 @@ String.prototype.format = function (...data: Array<any>)
                 if (!par.hasOwnProperty(j)) continue;
                 if (typeof par[j] === 'object' || par[j] === null || par[j] === undefined || $.isFunction(par[j])) continue;
 
-                temp = temp.replaceAll('{' + j + '}', par[j], true);
+                temp = temp.replaceAll('{' + j + '}', par[j] + '', true);
             }
         }
         else
         {
-            temp = temp.replaceAll('{' + i + '}', arguments[i], true);
+            temp = temp.replaceAll('{' + i + '}', arguments[i] + '', true);
         }
     }
 
@@ -350,8 +350,6 @@ interface JQueryStatic
             method = undefined;
         }
 
-        if (isNewWindow === undefined) isNewWindow = true;
-
         if (url.indexOf('~/') === 0) url = $.getUrl(url);
         var form = $('<form />');
         form.attr('id', 'form' + (new Date()).getTime());
@@ -373,9 +371,9 @@ interface JQueryStatic
                     var pair = this.split('=');
                     $('<input type="hidden" />').attr
                         ({
-                            name: pair[0],
-                            value: pair[1]
-                        }).appendTo(form);
+                        name: pair[0],
+                        value: pair[1]
+                    }).appendTo(form);
                 });
             }
             else
@@ -384,10 +382,10 @@ interface JQueryStatic
                 {
                     $('<input />').attr
                         ({
-                            type: 'hidden',
-                            name: key,
-                            value: value + ''
-                        }).appendTo(form);
+                        type: 'hidden',
+                        name: key,
+                        value: value + ''
+                    }).appendTo(form);
                 });
             }
         }
@@ -511,88 +509,86 @@ interface JQuery
             }
 
             return value;
-        } else
+        }
+
+        var compareValue = function (value1, value2)
         {
-            var compareValue = function (value1, value2)
+            if (value1 === undefined || value1 === null)
             {
-                if (value1 === undefined || value1 === null)
-                {
-                    value1 = '';
-                } else
-                {
-                    value1 = value1.toString().toLowerCase();
-                }
-                if (value2 === undefined || value2 === null)
-                {
-                    value2 = '';
-                } else
-                {
-                    value2 = value2.toString().toLowerCase();
-                }
-
-                return value1 === value2;
-            };
-
-            if (x.is(':radio'))
-            {
-                if (x.length == 1)
-                {
-                    x = x.parents('form').find(':radio[name=' + x[0].name + ']');
-                }
-
-                x.each(function ()
-                {
-                    if (compareValue(this.value, value))
-                    {
-                        $(this).attr('checked', 'on');
-                    } else
-                    {
-                        $(this).removeAttr('checked');
-                    }
-                });
-            } else if (x.is(':checkbox'))
-            {
-                if (this[0].value && typeof value !== 'boolean')
-                {
-                    value = this[0].value === value;
-                }
-
-                if (value)
-                    x.attr('checked', 'on');
-                else
-                    x.removeAttr('checked');
-            } else if (x.is('select'))
-            {
-                var selectedValue;
-
-                $('option', x).each(function ()
-                {
-                    var cValue = $(this).val();
-
-                    if (compareValue(cValue, value)) selectedValue = cValue;
-                });
-
-                x.val(selectedValue === undefined ? $('option:eq(0)', x).val() : selectedValue);
+                value1 = '';
             } else
             {
-                x.val(value);
+                value1 = value1.toString().toLowerCase();
             }
-
-            return this;
-        }
-
-        function getChkValue()
-        {
-            var value = this.val();
-
-            if (this[0].value !== 'on' && this[0].value)
+            if (value2 === undefined || value2 === null)
             {
-                return this.is(':checked') ? this[0].value : null;
+                value2 = '';
+            } else
+            {
+                value2 = value2.toString().toLowerCase();
             }
 
-            return value === 'on' ? this.is(':checked') : value;
+            if (typeof value2 === 'number')
+            {
+                value1 = parseFloat(value1);
+            }
+
+            return value1 === value2;
+        };
+
+        if (x.is(':radio'))
+        {
+            if (x.length == 1)
+            {
+                x = x.parents('form').find(':radio[name=' + x[0].name + ']');
+            }
+
+            x.each(function ()
+            {
+                if (compareValue(this.value, value)) $(this).prop('checked', true);
+            });
+        } else if (x.is(':checkbox'))
+        {
+            if (this[0].value && typeof value !== 'boolean')
+            {
+                value = this[0].value === value;
+            }
+
+            if (value)
+                x.attr('checked', 'on');
+            else
+                x.removeAttr('checked');
+        } else if (x.is('select'))
+        {
+            var selectedValue;
+
+            $('option', x).each(function ()
+            {
+                var cValue = $(this).val();
+
+                if (compareValue(cValue, value)) selectedValue = cValue;
+            });
+
+            x.val(selectedValue === undefined ? $('option:eq(0)', x).val() : selectedValue);
+        } else
+        {
+            x.val(value);
         }
-    };
+
+        return this;
+    }
+
+    function getChkValue()
+    {
+        var value = this.val();
+
+        if (this[0].value !== 'on' && this[0].value)
+        {
+            return this.is(':checked') ? this[0].value : null;
+        }
+
+        return value === 'on' ? this.is(':checked') : value;
+    }
 
     fn.submitForm = function (data?: Object)
     {
@@ -603,11 +599,11 @@ interface JQuery
 
         return $.ajax
             ({
-                type: 'POST',
-                dataType: 'json',
-                url: $.getUrl(form.attr('action')),
-                data: $.postify(data)
-            });
+            type: 'POST',
+            dataType: 'json',
+            url: $.getUrl(form.attr('action')),
+            data: $.postify(data)
+        });
     };
 })(jQuery.fn);
 
@@ -836,40 +832,40 @@ module Higgs
             .filter(':visible,input[type=hidden]')
             .not(':disabled,button')
             .each(function ()
+        {
+            if (!this.name) return;
+
+            var el = $(this);
+            var value = el.value();
+
+            if (settings.ignoreEmptyValue && (value === '' || value === null)) return;
+
+            var cValue = $.getObject(this.name, undefined, result);
+
+            if (el.is(':radio'))
             {
-                if (!this.name) return;
-
-                var el = $(this);
-                var value = el.value();
-
-                if (settings.ignoreEmptyValue && (value === '' || value === null)) return;
-
-                var cValue = $.getObject(this.name, undefined, result);
-
-                if (el.is(':radio'))
-                {
-                    if (value)
-                    {
-                        $.setObject(this.name, value, result);
-                    }
-                }
-                else if (cValue !== undefined)
-                {
-                    if ($.isArray(cValue))
-                    {
-                        var cArray = <Array<any>>cValue;
-                        cArray.push(value);
-                    }
-                    else
-                    {
-                        $.setObject(this.name, [cValue, value], result);
-                    }
-                }
-                else
+                if (value)
                 {
                     $.setObject(this.name, value, result);
                 }
-            });
+            }
+            else if (cValue !== undefined)
+            {
+                if ($.isArray(cValue))
+                {
+                    var cArray = <Array<any>>cValue;
+                    cArray.push(value);
+                }
+                else
+                {
+                    $.setObject(this.name, [cValue, value], result);
+                }
+            }
+            else
+            {
+                $.setObject(this.name, value, result);
+            }
+        });
 
         return result;
     }
@@ -946,49 +942,49 @@ module Higgs
         controls
             .not('button')
             .each((item: number, el: HTMLInputElement) =>
+        {
+            if (!el.name) return;
+
+            var list = <Higgs.IValidationRuleArray>(new validationRuleArray());
+            var elData = $(el).data();
+
+            for (var i = 0; i < elementValidations.length; i++)
             {
-                if (!el.name) return;
+                var rule = elementValidations[i];
+                var ruleFn = rule.validation;
+                var createRuleObjFn = <Function>ruleFn['create'];
 
-                var list = <Higgs.IValidationRuleArray>(new validationRuleArray());
-                var elData = $(el).data();
+                if (!createRuleObjFn) continue;
 
-                for (var i = 0; i < elementValidations.length; i++)
+                // create rule instance from DOM
+                var ruleObj = <Higgs.AbstructValidation>createRuleObjFn(el, elData);
+
+                if (ruleObj)
                 {
-                    var rule = elementValidations[i];
-                    var ruleFn = rule.validation;
-                    var createRuleObjFn = <Function>ruleFn['create'];
+                    // Patch with custom error message
+                    var customMessage = elData['msg' + rule.name];
 
-                    if (!createRuleObjFn) continue;
-
-                    // create rule instance from DOM
-                    var ruleObj = <Higgs.AbstructValidation>createRuleObjFn(el, elData);
-
-                    if (ruleObj)
+                    if (customMessage)
                     {
-                        // Patch with custom error message
-                        var customMessage = elData['msg' + rule.name];
-
-                        if (customMessage)
+                        if (typeof customMessage === "string")
                         {
-                            if (typeof customMessage === "string")
-                            {
-                                ruleObj.message = () => customMessage;
-                            }
-                            else if (typeof customMessage === "function")
-                            {
-                                ruleObj.message = customMessage;
-                            }
+                            ruleObj.message = () => customMessage;
                         }
-
-                        list.push(ruleObj);
+                        else if (typeof customMessage === "function")
+                        {
+                            ruleObj.message = customMessage;
+                        }
                     }
-                }
 
-                if (list.length > 0)
-                {
-                    $.setObject(el.name, list, result);
+                    list.push(ruleObj);
                 }
-            });
+            }
+
+            if (list.length > 0)
+            {
+                $.setObject(el.name, list, result);
+            }
+        });
 
         // Get property rules
         for (var i = 0; i < propertyValidationDatas.length; i++)
@@ -1399,7 +1395,7 @@ module Higgs.Rules
     {
         constructor(isFloat?: boolean)
         {
-            super(isFloat ? /^\d+(.\d+)?$/ : /^\d+$/);
+            super(isFloat ? /^-?\d{1,3}(,?\d{3})*(\.\d+)?$/g : /^-?\d{1,3}(,?\d{3})*$/g);
         }
 
         message(context: Higgs.ValidateContext<Object>, value: any): string
@@ -1772,7 +1768,7 @@ module Higgs.Rules
 interface JQuery
 {
     redraw(): JQuery;
-    validate(options?: Higgs.ValidateOptions): boolean;
+    validate(options?: Higgs.ValidateOptions, customValidationResult?: Array<Higgs.ValidationResult>): boolean;
     clearValidationResult();
     displayValidationResult(result: Array<Higgs.ValidationResult>, options?: Higgs.ValidateOptions): boolean;
     disableHtml5Validation(): JQuery;
@@ -1854,8 +1850,8 @@ module Higgs
                     {
                         feedback.css
                             ({
-                                right: (rightMargin + parseInt(feedback.css('right'), 10)) + 'px'
-                            });
+                            right: (rightMargin + parseInt(feedback.css('right'), 10)) + 'px'
+                        });
                     }
                 }
                 else
@@ -1886,7 +1882,8 @@ module Higgs
             if (input.is('.select2'))
             {
                 input.on('select2-focus.validationResult.popover', <string>null, <Object>cResult, onFocusInvalidInput);
-            } else
+            }
+            else
             {
                 input.on('focus.validationResult.popover', <string>null, <Object>cResult, onFocusInvalidInput);
             }
@@ -1912,17 +1909,18 @@ module Higgs
         fn.displayValidationResult.createPopover();
 
         $('<p/>')
-            .text(getErrorMessage(result))
+            .html(getErrorMessage(result))
             .appendTo(popoverContent);
 
         var popOverTarget = input.data('popoverTarget') || input.parent().is('.input-group') ? input.parent() : input;
 
+        // TODO: auto display in other placement if popover is overflow.
         popover
             .data('target', this)
             .modalPopover
             ({
-                target: popOverTarget
-            })
+            target: popOverTarget
+        })
             .modalPopover('show');
     }
 
@@ -1965,11 +1963,10 @@ module Higgs
         popover.append($('<div class="arrow" />'));
 
         popoverContent = $('<div class="popover-content" />').appendTo(popover);
-
         popover.appendTo(document.body);
     };
 
-    fn.validate = function (options?: Higgs.ValidateOptions): boolean
+    fn.validate = function (options?: Higgs.ValidateOptions, customValidationResult?: Array<Higgs.ValidationResult>): boolean
     {
         var isTotalValid = true;
 
@@ -1980,45 +1977,48 @@ module Higgs
 
             var result = container.validateModel(options);
 
-            // Some hidden input is not count as invalid.
+            if (customValidationResult) result = $.merge(result, customValidationResult);
+
+            // Some hidden input is not counted as invalid.
             var isValid = container.displayValidationResult(result, options);
 
             container.off('.higgs.revalidate');
-            if (!isValid)
-            {
-                container.on('blur.higgs.revalidate change.higgs.revalidate', '.has-error :input', options, (e: JQueryEventObject) =>
-                {
-                    if (popover)
-                    {
-                        var cTarget = popover.data('target');
-
-                        if (cTarget === e.target)
-                        {
-                            popover.remove();
-                        }
-                        else
-                        {
-                            // TODO: Investigate why select2-focusser trigger blur event instead of normal input.
-                            var $target = $(e.target);
-                            if ($target.is('.select2-focusser') && $target.parents('.select2-container').next()[0] === cTarget)
-                            {
-                                popover.remove();
-                            }
-                        }
-                    }
-
-                    var validationOptions = <Higgs.ValidateOptions>e.data;
-
-                    validationOptions.enableFadeInFeedback = false;
-                    container.validate(validationOptions);
-                });
-            }
+            if (!isValid) setupValidationBlur(container, options);
 
             isTotalValid = isTotalValid && isValid;
         });
 
         return isTotalValid;
     };
+
+    function setupValidationBlur(container: JQuery, options: Higgs.ValidateOptions)
+    {
+        container.on('blur.higgs.revalidate change.higgs.revalidate', '.has-error :input', options,(e: JQueryEventObject) =>
+        {
+            if (popover)
+            {
+                var cTarget = popover.data('target');
+
+                if (cTarget === e.target)
+                {
+                    popover.remove();
+                } else
+                {
+                    // TODO: Investigate why select2-focusser trigger blur event instead of normal input.
+                    var $target = $(e.target);
+                    if ($target.is('.select2-focusser') && $target.parents('.select2-container').next()[0] === cTarget)
+                    {
+                        popover.remove();
+                    }
+                }
+            }
+
+            var validationOptions = <Higgs.ValidateOptions>e.data;
+
+            validationOptions.enableFadeInFeedback = false;
+            container.validate(validationOptions);
+        });
+    }
 
     // Disable HTML5 form validation
     fn.disableHtml5Validation = function ()
