@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Higgs RIA Framework")]
 [assembly: AssemblyDescription("Rapid development framework for Microsoft ASP.NET MVC")]
 [assembly: AssemblyCompany("Soul_Master")]
-[assembly: AssemblyCopyright("Copyright \x00a9 2014, Soul_Master. All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright \x00a9 2015, Soul_Master. All rights reserved.")]
 [assembly: ComVisible(false)]
 //[assembly: AllowPartiallyTrustedCallers]
 
@@ -37,7 +37,7 @@ using System.Runtime.InteropServices;
  *          Build Number = amount of normal building solution
 */
 #endregion
-[assembly: AssemblyVersion("3.0.8.0")]
+[assembly: AssemblyVersion("3.0.17.0")]
 
 #region Assembly Informational Version
 /*

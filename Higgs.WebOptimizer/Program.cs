@@ -11,9 +11,10 @@ namespace Higgs.WebOptimizer
     {
         static void Main(string[] args)
         {
-            var projectDir = new DirectoryInfo(args[0]);
-            var deployDir = new DirectoryInfo(args[1]);
-
+            //var projectDir = new DirectoryInfo(args[0]);
+            //var deployDir = new DirectoryInfo(args[1]);
+            var projectDir = new DirectoryInfo(@"I:\myProject\ChemInvent\ChemInvent");
+            var deployDir = new DirectoryInfo(@"D:\PackageTmp");
             var viewPages = projectDir.GetFiles("*.cshtml", SearchOption.AllDirectories);
 
             MinifyJs(viewPages, deployDir.FullName);

@@ -6,8 +6,9 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Higgs.Core.Helpers;
+using Higgs.OpenXml;
 
-namespace Higgs.Web.OpenXml
+namespace Higgs.OpenXml
 {
     // Based on: http://dotscrapbook.wordpress.com/2012/03/23/openxml-spreadsheets-with-multiple-worksheets-using-net-sdk/
     public class ExcelDocument : IDisposable

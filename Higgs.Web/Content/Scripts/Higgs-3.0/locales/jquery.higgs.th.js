@@ -1,10 +1,7 @@
-﻿(function (locales) {
+(function (locales) {
     var f = function (message) {
-        return function () {
-            return message.format(this);
-        };
+        return function () { return message.format(this); };
     };
-
     locales.push({
         name: 'TH',
         rules: {
@@ -26,7 +23,6 @@
         }
     });
 })(Higgs.locales);
-
 if (!window['locale'] || window['locale'].toUpperCase() === 'th')
     Higgs.locale = Higgs.locales[Higgs.locales.length - 1];
 //# sourceMappingURL=jquery.higgs.th.js.map
