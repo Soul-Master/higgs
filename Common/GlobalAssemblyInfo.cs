@@ -37,7 +37,7 @@ using System.Runtime.InteropServices;
  *          Build Number = amount of normal building solution
 */
 #endregion
-[assembly: AssemblyVersion("3.0.17.0")]
+[assembly: AssemblyVersion("3.1.0.0")]
 
 #region Assembly Informational Version
 /*
@@ -67,4 +67,4 @@ using System.Runtime.InteropServices;
  * 
 */
 #endregion
-[assembly: AssemblyInformationalVersion("3.0")]
+[assembly: AssemblyInformationalVersion("3.1")]

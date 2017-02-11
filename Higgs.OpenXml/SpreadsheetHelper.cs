@@ -12,6 +12,8 @@ namespace Higgs.OpenXml
 {
     public static class SpreadsheetHelper
     {
+        public static DoubleValue ColumnMaxWidth = 100;
+
         public static Stylesheet AddDefaultStyleSheet(this Workbook book)
         {
             var styleSheet = new Stylesheet(
@@ -484,7 +486,10 @@ namespace Higgs.OpenXml
                 if (width > maxWidth) maxWidth = width;
             }
 
-            if (maxWidth > 0) column.Width = maxWidth;
+            if (maxWidth > 0)
+            {
+                column.Width = maxWidth <= ColumnMaxWidth ? (DoubleValue)maxWidth : ColumnMaxWidth;
+            }
 
             return column;
         }

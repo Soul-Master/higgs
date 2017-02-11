@@ -36,5 +36,10 @@ namespace Higgs.Web
         public string RedirectTo { get; set; }
 
         public object ResultData { get; set; }
+
+        public static HiggsResult Success()
+        {
+            return new HiggsResult();
+        }
     }
 }

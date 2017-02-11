@@ -1,84 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\ExtensionPack\4.0\MSBuild.ExtensionPack.tasks"/>
+    <Import Project="$(MSBuildExtensionsPath)\ExtensionPack\4.0\MSBuild.ExtensionPack.tasks"/>
 
-  <Target Name="AfterBuild">
-    <!-- Copy all Linked file -->
-    <Delete Condition=" '%(Content.Link)' != '' " Files="$(ProjectDir)\%(Content.Link)" />
-    <Copy Condition=" '%(Content.Link)' != '' " SourceFiles="%(Content.Identity)" DestinationFiles="$(ProjectDir)\%(Content.Link)" />
-    
-    <CallTarget Targets="HiggsPackage" ContinueOnError="true" />
-    <CallTarget Targets="HiggsWebCorePackage" ContinueOnError="true" />
-    <CallTarget Targets="HiggsWebPackage" ContinueOnError="true" />
-    <CallTarget Targets="HiggsWebOptimizerTask" ContinueOnError="true" />
-  </Target>
+    <Target Name="AfterBuild">
+        <!-- Copy all Linked file -->
+        <Delete Condition=" '%(Content.Link)' != '' " Files="$(ProjectDir)\%(Content.Link)" />
+        <Copy Condition=" '%(Content.Link)' != '' " SourceFiles="%(Content.Identity)" DestinationFiles="$(ProjectDir)\%(Content.Link)" />
 
-  <Target Name="HiggsPackage">
-    <Message Text="------ Start building 'Higgs' package ------" Importance="high" />
-    <GetAssemblyIdentity AssemblyFiles="$(OutDir)/Higgs.Core.dll">
-      <Output TaskParameter="Assemblies" ItemName="HiggsInfo"/>
-    </GetAssemblyIdentity>
-    
-    <Copy SourceFiles="$(OutDir)/Higgs.Core.dll" DestinationFolder="Packages/Higgs/lib/net40" />
-    <Copy SourceFiles="$(ProjectDir)Packages\Higgs\Higgs.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs\Higgs.%(HiggsInfo.Version).nuspec" />
-    <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="3\.0\.0\.0" Replacement="%(HiggsInfo.Version)"
-                                           Files="$(ProjectDir)Packages\Higgs\Higgs.%(HiggsInfo.Version).nuspec"/>
-    <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs\Higgs.%(HiggsInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"
-          WorkingDirectory="../.nuget" />
-    <Delete Files="$(ProjectDir)Packages\Higgs\Higgs.%(HiggsInfo.Version).nuspec" ContinueOnError="true" />
-    <Move SourceFiles="$(ProjectDir)Packages\Higgs.%(HiggsInfo.Version).nupkg" DestinationFiles="$(ProjectDir)Packages\Higgs.nupkg" />
-  </Target>
+        <CallTarget Targets="HiggsPackage" ContinueOnError="true" />
+        <CallTarget Targets="HiggsWebCorePackage" ContinueOnError="true" />
+        <CallTarget Targets="HiggsWebPackage" ContinueOnError="true" />
+        <CallTarget Targets="HiggsWebOptimizerTask" ContinueOnError="true" />
+        <CallTarget Targets="HiggsOpenXML" ContinueOnError="true" />
+    </Target>
 
-  <Target Name="HiggsWebCorePackage">
-    <Message Text="------ Start building 'Higgs.Web.Core' package ------" Importance="high" />
-    <GetAssemblyIdentity AssemblyFiles="$(OutDir)/Higgs.Web.dll">
-      <Output TaskParameter="Assemblies" ItemName="HiggsWebCoreInfo"/>
-    </GetAssemblyIdentity>
-    
-    <Copy SourceFiles="$(OutDir)/Higgs.Web.dll" DestinationFolder="Packages/Higgs.Web.Core/lib/net40" />
-    <Copy SourceFiles="$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.%(HiggsWebCoreInfo.Version).nuspec" />
-    <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="3\.0\.0\.0" Replacement="%(HiggsWebCoreInfo.Version)" 
-                                           Files="$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.%(HiggsWebCoreInfo.Version).nuspec"/>
-    <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.%(HiggsWebCoreInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"
-          WorkingDirectory="../.nuget" />
-    <Delete Files="$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.%(HiggsWebCoreInfo.Version).nuspec" ContinueOnError="true" />
-    <RemoveDir Directories="Packages/Higgs.Web.Core/lib" />
-    <Move SourceFiles="$(ProjectDir)Packages\Higgs.Web.Core.%(HiggsWebCoreInfo.Version).nupkg" DestinationFiles="$(ProjectDir)Packages\Higgs.Web.Core.nupkg" />
-  </Target>
+    <Target Name="HiggsPackage">
+        <Message Text="------ Start building 'Higgs' package ------" Importance="high" />
+        <GetAssemblyIdentity AssemblyFiles="$(OutDir)/Higgs.Core.dll">
+            <Output TaskParameter="Assemblies" ItemName="HiggsInfo"/>
+        </GetAssemblyIdentity>
 
-  <Target Name="HiggsWebPackage">
-    <Message Text="------ Start building 'Higgs.Web' package ------" Importance="high" />
-    <GetAssemblyIdentity AssemblyFiles="$(OutDir)/Higgs.Web.dll">
-      <Output TaskParameter="Assemblies" ItemName="HiggsWebInfo"/>
-    </GetAssemblyIdentity>
-    
-    <Copy SourceFiles="$(ProjectDir)Packages\Higgs.Web\Higgs.Web.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs.Web\Higgs.Web.%(HiggsWebInfo.Version).nuspec" />
-    <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="3\.0\.0\.0" Replacement="%(HiggsWebInfo.Version)" 
-                                           Files="$(ProjectDir)Packages\Higgs.Web\Higgs.Web.%(HiggsWebInfo.Version).nuspec"/>
-    <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs.Web\Higgs.Web.%(HiggsWebInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"
-          WorkingDirectory="../.nuget" />
-    <Delete Files="$(ProjectDir)Packages\Higgs.Web\Higgs.Web.%(HiggsWebInfo.Version).nuspec" ContinueOnError="true" />
-    <!--<RemoveDir Directories="Packages/Higgs.Web/content" />-->
-    <Move SourceFiles="$(ProjectDir)Packages\Higgs.Web.%(HiggsWebInfo.Version).nupkg" DestinationFiles="$(ProjectDir)Packages\Higgs.Web.nupkg" />
-    
-  </Target>
+        <Copy SourceFiles="$(OutDir)/Higgs.Core.dll" DestinationFolder="Packages/Higgs/lib/net40" />
+        <Copy SourceFiles="$(ProjectDir)Packages\Higgs\Higgs.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs\Higgs.%(HiggsInfo.Version).nuspec" />
+        <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="3\.0\.0\.0" Replacement="%(HiggsInfo.Version)"
+                                               Files="$(ProjectDir)Packages\Higgs\Higgs.%(HiggsInfo.Version).nuspec"/>
+        <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs\Higgs.%(HiggsInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"
+              WorkingDirectory="../.nuget" />
+        <Delete Files="$(ProjectDir)Packages\Higgs\Higgs.%(HiggsInfo.Version).nuspec" ContinueOnError="true" />
+        <Move SourceFiles="$(ProjectDir)Packages\Higgs.%(HiggsInfo.Version).nupkg" DestinationFiles="$(ProjectDir)Packages\Higgs.nupkg" />
+    </Target>
 
-  <Target Name="HiggsWebOptimizerTask">
-    <Message Text="------ Start building 'Higgs.WebOptimizerTask' package ------" Importance="high" />
-    <GetAssemblyIdentity AssemblyFiles="$(OutDir)/Higgs.WebOptimizer.exe">
-      <Output TaskParameter="Assemblies" ItemName="HiggsWebOptimizerInfo"/>
-    </GetAssemblyIdentity>
+    <Target Name="HiggsWebCorePackage">
+        <Message Text="------ Start building 'Higgs.Web.Core' package ------" Importance="high" />
+        <GetAssemblyIdentity AssemblyFiles="$(OutDir)/Higgs.Web.dll">
+            <Output TaskParameter="Assemblies" ItemName="HiggsWebCoreInfo"/>
+        </GetAssemblyIdentity>
 
-    <Copy SourceFiles="$(OutDir)/Higgs.WebOptimizer.exe" DestinationFiles="$(ProjectDir)Packages\Higgs.WebOptimizerTask\tools\Higgs.WebOptimizer.exe" />
-    <Copy SourceFiles="$(ProjectDir)Packages\Higgs.WebOptimizerTask\Higgs.WebOptimizerTask.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs.WebOptimizerTask\Higgs.WebOptimizerTask.%(HiggsWebOptimizerInfo.Version).nuspec" />
-    
-    <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="1\.0\.0\.0" Replacement="%(HiggsWebOptimizerInfo.Version)"
-                                           Files="$(ProjectDir)Packages\Higgs.WebOptimizerTask\Higgs.WebOptimizerTask.%(HiggsWebOptimizerInfo.Version).nuspec"/>
+        <Copy SourceFiles="$(OutDir)/Higgs.Web.dll" DestinationFolder="Packages/Higgs.Web.Core/lib/net40" />
+        <Copy SourceFiles="$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.%(HiggsWebCoreInfo.Version).nuspec" />
+        <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="3\.0\.0\.0" Replacement="%(HiggsWebCoreInfo.Version)"
+                                               Files="$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.%(HiggsWebCoreInfo.Version).nuspec"/>
+        <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.%(HiggsWebCoreInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"
+              WorkingDirectory="../.nuget" />
+        <Delete Files="$(ProjectDir)Packages\Higgs.Web.Core\Higgs.Web.Core.%(HiggsWebCoreInfo.Version).nuspec" ContinueOnError="true" />
+        <RemoveDir Directories="Packages/Higgs.Web.Core/lib" />
+        <Move SourceFiles="$(ProjectDir)Packages\Higgs.Web.Core.%(HiggsWebCoreInfo.Version).nupkg" DestinationFiles="$(ProjectDir)Packages\Higgs.Web.Core.nupkg" />
+    </Target>
 
-    <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs.WebOptimizerTask\Higgs.WebOptimizerTask.%(HiggsWebOptimizerInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"
-          WorkingDirectory="../.nuget" />
-    <Delete Files="$(ProjectDir)Packages\Higgs.WebOptimizerTask\Higgs.WebOptimizerTask.%(HiggsWebOptimizerInfo.Version).nuspec" ContinueOnError="true" />
-    <Move SourceFiles="$(ProjectDir)Packages\Higgs.WebOptimizerTask.%(HiggsWebOptimizerInfo.Version).nupkg" DestinationFiles="$(ProjectDir)Packages\Higgs.WebOptimizerTask.nupkg" />
-  </Target>
+    <Target Name="HiggsWebPackage">
+        <Message Text="------ Start building 'Higgs.Web' package ------" Importance="high" />
+        <GetAssemblyIdentity AssemblyFiles="$(OutDir)/Higgs.Web.dll">
+            <Output TaskParameter="Assemblies" ItemName="HiggsWebInfo"/>
+        </GetAssemblyIdentity>
+
+        <Copy SourceFiles="$(ProjectDir)Packages\Higgs.Web\Higgs.Web.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs.Web\Higgs.Web.%(HiggsWebInfo.Version).nuspec" />
+        <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="3\.0\.0\.0" Replacement="%(HiggsWebInfo.Version)"
+                                               Files="$(ProjectDir)Packages\Higgs.Web\Higgs.Web.%(HiggsWebInfo.Version).nuspec"/>
+        <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs.Web\Higgs.Web.%(HiggsWebInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"
+              WorkingDirectory="../.nuget" />
+        <Delete Files="$(ProjectDir)Packages\Higgs.Web\Higgs.Web.%(HiggsWebInfo.Version).nuspec" ContinueOnError="true" />
+        <!--<RemoveDir Directories="Packages/Higgs.Web/content" />-->
+        <Move SourceFiles="$(ProjectDir)Packages\Higgs.Web.%(HiggsWebInfo.Version).nupkg" DestinationFiles="$(ProjectDir)Packages\Higgs.Web.nupkg" />
+
+    </Target>
+
+    <Target Name="HiggsWebOptimizerTask">
+        <Message Text="------ Start building 'Higgs.WebOptimizerTask' package ------" Importance="high" />
+        <GetAssemblyIdentity AssemblyFiles="$(OutDir)/Higgs.WebOptimizer.exe">
+            <Output TaskParameter="Assemblies" ItemName="HiggsWebOptimizerInfo"/>
+        </GetAssemblyIdentity>
+
+        <Copy SourceFiles="$(OutDir)/Higgs.WebOptimizer.exe" DestinationFiles="$(ProjectDir)Packages\Higgs.WebOptimizerTask\tools\Higgs.WebOptimizer.exe" />
+        <Copy SourceFiles="$(ProjectDir)Packages\Higgs.WebOptimizerTask\Higgs.WebOptimizerTask.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs.WebOptimizerTask\Higgs.WebOptimizerTask.%(HiggsWebOptimizerInfo.Version).nuspec" />
+
+        <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="1\.0\.0\.0" Replacement="%(HiggsWebOptimizerInfo.Version)"
+                                               Files="$(ProjectDir)Packages\Higgs.WebOptimizerTask\Higgs.WebOptimizerTask.%(HiggsWebOptimizerInfo.Version).nuspec"/>
+
+        <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs.WebOptimizerTask\Higgs.WebOptimizerTask.%(HiggsWebOptimizerInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"
+              WorkingDirectory="../.nuget" />
+        <Delete Files="$(ProjectDir)Packages\Higgs.WebOptimizerTask\Higgs.WebOptimizerTask.%(HiggsWebOptimizerInfo.Version).nuspec" ContinueOnError="true" />
+        <Move SourceFiles="$(ProjectDir)Packages\Higgs.WebOptimizerTask.%(HiggsWebOptimizerInfo.Version).nupkg" DestinationFiles="$(ProjectDir)Packages\Higgs.WebOptimizerTask.nupkg" />
+    </Target>
+
+    <Target Name="HiggsOpenXML">
+        <Message Text="------ Start building 'Higgs.OpenXML' package ------" Importance="high" />
+        <GetAssemblyIdentity AssemblyFiles="$(OutDir)/Higgs.OpenXml.dll">
+            <Output TaskParameter="Assemblies" ItemName="HiggsInfo"/>
+        </GetAssemblyIdentity>
+
+        <Copy SourceFiles="$(OutDir)/Higgs.OpenXml.dll" DestinationFolder="Packages/Higgs.OpenXml/lib/net40" />
+        <Copy SourceFiles="$(ProjectDir)Packages\Higgs.OpenXml\Higgs.OpenXml.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs.OpenXml\Higgs.OpenXml.%(HiggsInfo.Version).nuspec" />
+        <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="3\.0\.0\.0" Replacement="%(HiggsInfo.Version)"
+                                               Files="$(ProjectDir)Packages\Higgs.OpenXml\Higgs.OpenXml.%(HiggsInfo.Version).nuspec"/>
+        <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs.OpenXml\Higgs.OpenXml.%(HiggsInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"
+              WorkingDirectory="../.nuget" />
+        <Delete Files="$(ProjectDir)Packages\Higgs.OpenXml\Higgs.OpenXml.%(HiggsInfo.Version).nuspec" ContinueOnError="true" />
+        <Move SourceFiles="$(ProjectDir)Packages\Higgs.OpenXml.%(HiggsInfo.Version).nupkg" DestinationFiles="$(ProjectDir)Packages\Higgs.OpenXml.nupkg" />
+    </Target>
 </Project>

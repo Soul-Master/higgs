@@ -113,6 +113,9 @@ namespace Higgs.Core
                 if (hasIgnored && ignoredPropDic.ContainsKey(pName)) continue;
                 if (hasChanged && !changedPropDic.ContainsKey(pName)) continue;
 
+                // Ignore update `virtual` property that normally use by navigation property in EF
+                if (!hasChanged && pOld.GetMethod.IsVirtual) continue;
+                
                 var changedProp = changedPropertyDic[pName];
                 if (!changedProp.CanRead) continue;
                 if (IgnoreTypeNameList != null)

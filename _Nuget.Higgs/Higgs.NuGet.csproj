@@ -90,6 +90,10 @@
       <Project>{8f16b6a5-c40b-4e67-a8eb-8702e3786ac4}</Project>
       <Name>Higgs.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Higgs.OpenXml\Higgs.OpenXml.csproj">
+      <Project>{c4c3360a-c671-4401-9fee-7465d3d0406a}</Project>
+      <Name>Higgs.OpenXml</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Higgs.WebOptimizer\Higgs.WebOptimizer.csproj">
       <Project>{f4cef143-8d43-4536-8f34-0a7350d48a63}</Project>
       <Name>Higgs.WebOptimizer</Name>
@@ -112,6 +116,7 @@
     <None Include="NuGet.targets">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Packages\Higgs.OpenXml\Higgs.OpenXml.nuspec" />
     <None Include="Packages\Higgs.WebOptimizerTask\Higgs.WebOptimizerTask.nuspec" />
     <None Include="Packages\Higgs.WebOptimizerTask\build\Higgs.WebOptimizerTask.targets">
       <SubType>Designer</SubType>

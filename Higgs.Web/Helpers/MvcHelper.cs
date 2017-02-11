@@ -39,7 +39,7 @@ namespace Higgs.Web.Helpers
         {
             var temp = CoreExpressionHelper.GetMemberInfoesFromExpression(selectedPropertyExpression);
             var affectedKeys = temp.Aggregate("", (current, mi) => current + (mi.Name + "|"));
-            var properties = affectedKeys.Split(new[] {"|"}, StringSplitOptions.RemoveEmptyEntries);
+            var properties = affectedKeys.Split(new[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var p in properties)
             {
@@ -78,7 +78,7 @@ namespace Higgs.Web.Helpers
 
         public static HiggsResult AddCustomError(this HiggsResult result, string key, string errorMessage)
         {
-            var tokens = key.Split(new [] { ",", " " }, StringSplitOptions.RemoveEmptyEntries);
+            var tokens = key.Split(new[] { ",", " " }, StringSplitOptions.RemoveEmptyEntries);
             if (tokens.Length > 1)
             {
                 tokens.ForEach(x => AddCustomError(result, x, errorMessage));
@@ -145,7 +145,8 @@ namespace Higgs.Web.Helpers
                             from byte val in Enum.GetValues(enumType)
                             select new SelectListItem
                             {
-                                Value = val.ToString(), Text = Enum.GetName(enumType, val)
+                                Value = val.ToString(),
+                                Text = Enum.GetName(enumType, val)
                             }
                         ).ToList();
 
@@ -156,7 +157,7 @@ namespace Higgs.Web.Helpers
         {
             var temp = list.ToList();
             temp.Insert(index, item);
-            
+
             return new SelectList(temp, "Value", "Text");
         }
 
@@ -204,6 +205,41 @@ namespace Higgs.Web.Helpers
             if (!condition) return null;
 
             return new MvcHtmlString("checked=\"checked\"");
+        }
+
+        public static MvcHtmlString Disabled(this HtmlHelper helper, bool condition)
+        {
+            if (!condition) return null;
+
+            return new MvcHtmlString("disabled");
+        }
+
+        public static MvcHtmlString ToggleClass(this HtmlHelper helper, string className, bool condition)
+        {
+            if (!condition) return null;
+
+            return new MvcHtmlString(className);
+        }
+
+        public static MvcHtmlString ToggleAttribute(this HtmlHelper helper, string attributeName, bool condition, string value = null)
+        {
+            if (!condition) return null;
+
+            return new MvcHtmlString(attributeName + (value != null ? "=" + value : string.Empty));
+        }
+
+        public static MvcHtmlString ToIsoDate(this DateTime date)
+        {
+            var isoDate = string.Concat(date.ToString("s", System.Globalization.CultureInfo.InvariantCulture), "Z");
+
+            return new MvcHtmlString(isoDate);
+        }
+
+        public static MvcHtmlString ToIsoDate(this DateTime? date)
+        {
+            if (!date.HasValue) return MvcHtmlString.Empty;
+
+            return date.Value.ToIsoDate();
         }
     }
 }

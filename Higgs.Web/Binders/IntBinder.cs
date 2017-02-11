@@ -17,7 +17,15 @@ namespace Higgs.Web.Binders
                 return null;
             }
 
-            return int.Parse(valueResult.AttemptedValue.Trim(), NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands);
+            int result;
+            if (int.TryParse(valueResult.AttemptedValue.Trim(),
+                NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands,
+                CultureInfo.CurrentCulture, out result))
+            {
+                return result;
+            }
+
+            return null;
         }
     }
 }

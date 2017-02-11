@@ -24,6 +24,10 @@ namespace Higgs.Web.Helpers
             {
                 if (resultCallback != null) resultCallback(null, recordsTotal);
 
+                if (model.IsExport)
+                {
+                    return new HttpNotFoundResult();
+                }
                 return new JsonNetResult(HiggsResult.SerializerSettings)
                 {
                     Data = new DataTablesResponseModel(model.Draw, new String[] { }, 0, 0)
@@ -60,6 +64,8 @@ namespace Higgs.Web.Helpers
                             else isFirst = false;
 
                             var propertyName = col.Data.Substring(0, 1).ToUpper() + col.Data.Substring(1);
+
+
                             filter += propertyName + ".ToString().Contains(@" + i + ")";
                         }
 
@@ -153,7 +159,7 @@ namespace Higgs.Web.Helpers
                 if (col.ExportColSpan == 1 && colSpan == 0)
                 {
                     var cell1 = sheet.AddCell(header1, DefaultCellFormats.BoldCenterBorder);
-                    cell1.SetValueInlineString(col.ExportTitle);
+                    cell1.SetValueInlineString(col.ExportTitle ?? col.Name ?? col.Data);
 
                     if (hasSubColumn)
                     {
@@ -307,7 +313,7 @@ namespace Higgs.Web.Helpers
 
             return doc.Save();
         }
-
+        
         public static DefaultCellFormats ToCellFormat(this ExportDataType col)
         {
             DefaultCellFormats cellStyle;
@@ -380,9 +386,9 @@ namespace Higgs.Web.Helpers
         // For export only
         public string ExportTitle { get; set; }
         public string ExportGroupTitle { get; set; }
-        public int ExportColSpan { get; set; }
+        public int ExportColSpan { get; set; } = 1;
         public ExportDataType ExportDataType { get; set; }
-        public bool IsVisible { get; set; }
+        public bool IsVisible { get; set; } = true;
     }
     public class SearchModel
     {
