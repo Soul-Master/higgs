@@ -16,7 +16,13 @@ namespace Higgs.Web.Binders
                 return null;
             }
 
-            return decimal.Parse(valueResult.AttemptedValue.Trim(), NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands);
+            decimal result;
+            if (decimal.TryParse(valueResult.AttemptedValue.Trim(), NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, CultureInfo.CurrentCulture, out result))
+            {
+                return result;
+            }
+
+            return null;
         }
     }
 }

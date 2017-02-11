@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.ComponentModel;
+using System.Web.Mvc;
 
 namespace Higgs.Web.Binders
 {
@@ -10,14 +11,10 @@ namespace Higgs.Web.Binders
 
             if (valueResult == null || string.IsNullOrEmpty(valueResult.AttemptedValue))
             {
-                bindingContext.Model = null;
-            }
-            else
-            {
-                bindingContext.Model = valueResult.AttemptedValue.Trim();
+                return null;
             }
 
-            return true;
+            return valueResult.AttemptedValue.Trim();
         }
     }
 }

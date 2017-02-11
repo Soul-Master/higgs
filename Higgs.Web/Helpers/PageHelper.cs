@@ -53,7 +53,17 @@ namespace Higgs.Web.Helpers
 
             return readOnly != null && readOnly.Equals("true", StringComparison.CurrentCultureIgnoreCase);
         }
-        
+
+        public static string ResolveUrl(this HttpRequestBase request, string path)
+        {
+            return path[0] == '~' ? VirtualPathUtility.ToAbsolute(path, request.ApplicationPath) : path;
+        }
+
+        public static string ResolveAbsoluteUrl(this HttpRequestBase request, string path)
+        {
+            return string.Format("{0}://{1}{2}", request.Url.Scheme, request.Url.Authority, request.ResolveUrl(path));
+        }
+
         public static string ResolveUrl(this HtmlHelper helper, string path) 
         {
             return path[0] == '~' ? VirtualPathUtility.ToAbsolute(path, helper.ViewContext.RequestContext.HttpContext.Request.ApplicationPath) : path;

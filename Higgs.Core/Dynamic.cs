@@ -1187,12 +1187,18 @@ namespace System.Linq.Dynamic
                             id, GetTypeName(type));
                     case 1:
                         MethodInfo method = (MethodInfo)mb;
+                        if(IsNullableType(method.DeclaringType))
+                        {
+
+                        }
+
                         if (!IsPredefinedType(method.DeclaringType))
                             throw ParseError(errorPos, Res.MethodsAreInaccessible, GetTypeName(method.DeclaringType));
                         if (method.ReturnType == typeof(void))
                             throw ParseError(errorPos, Res.MethodIsVoid,
                                 id, GetTypeName(method.DeclaringType));
                         return Expression.Call(instance, (MethodInfo)method, args);
+
                     default:
                         throw ParseError(errorPos, Res.AmbiguousMethodInvocation,
                             id, GetTypeName(type));
@@ -1347,8 +1353,7 @@ namespace System.Linq.Dynamic
         }
 
         static bool IsPredefinedType(Type type) {
-            foreach (Type t in predefinedTypes) if (t == type) return true;
-            return false;
+            return predefinedTypes.Contains(type);
         }
 
         static bool IsNullableType(Type type) {

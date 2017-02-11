@@ -9,8 +9,7 @@
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Higgs;
 (function (Higgs) {
@@ -18,7 +17,7 @@ var Higgs;
         function AjaxResult() {
         }
         return AjaxResult;
-    })();
+    }());
     Higgs.AjaxResult = AjaxResult;
     function escapeRegex(text) {
         if (!text)
@@ -29,7 +28,6 @@ var Higgs;
     ;
     Higgs.disableElementSelect = ':input, button, .btn';
     Higgs.locales = new Array();
-    Higgs.locale;
     function setLanguage(code) {
         var loc = null;
         for (var i = 0; i < Higgs.locales.length; i++) {
@@ -62,26 +60,22 @@ var Higgs;
             numberValidation_Decimal: f('Data is not a valid number'),
             urlValidation: f('Data is not a valid URL'),
             emailValidation: f('Data is not a valid email address'),
-            moreThanValidation: f('Data should has value more than {value}'),
-            minValidation: f('Data should has value at least {value}'),
-            lessThanValidation: f('Data should has value less than {value}'),
-            maxValidation: f('Data should has value less than or equal {value}'),
-            equalValidation: f('Data should has value equal to {label:{equalProperty}}'),
-            notEqualValidation: f('Data should has value not equal to {label:{notEqualProperty}}')
+            moreThanValidation: f('Data should have value more than {value}'),
+            minValidation: f('Data should have value at least {value}'),
+            lessThanValidation: f('Data should have value less than {value}'),
+            maxValidation: f('Data should have value less than or equal {value}'),
+            equalValidation: f('Data should have value equal to {label:{equalProperty}}'),
+            notEqualValidation: f('Data should have value not equal to {label:{notEqualProperty}}')
         }
     });
 })(Higgs.locales);
 if (!window['locale'] || window['locale'].toUpperCase() === 'EN')
     Higgs.locale = Higgs.locales[Higgs.locales.length - 1];
-// TODO: Make sure this function do same process as StringHelper.Format
-String.prototype.format = function () {
-    var data = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        data[_i - 0] = arguments[_i];
-    }
+String.prototype.format = function (data) {
     var temp = this.toString();
-    for (var i = 0; i < data.length; i++) {
-        var par = data[i];
+    var args = !Array.isArray(data) ? [data] : data;
+    for (var i = 0; i < args.length; i++) {
+        var par = args[i];
         if (typeof par === 'object') {
             if (!par)
                 continue;
@@ -144,10 +138,10 @@ String.prototype.padLeft = function (length, padChar) {
         });
     };
     $.baseUrl = function (url) {
-        if (url) {
-            baseUrl = url;
+        if (!url) {
+            return baseUrl;
         }
-        return baseUrl;
+        baseUrl = url;
     };
     $.getUrl = function (logicalPath) {
         if (!logicalPath)
@@ -159,6 +153,8 @@ String.prototype.padLeft = function (length, padChar) {
         return baseUrl + logicalPath.substring(2);
     };
     $.getObject = function (parts, defaultValue, context) {
+        if (!parts)
+            return defaultValue;
         if (typeof parts === 'string') {
             // Support array index path without JavaScript syntax validation.
             // foo[0].bar
@@ -188,10 +184,15 @@ String.prototype.padLeft = function (length, padChar) {
     $.postify = function (value) {
         var result = {};
         var buildResult = function (object, prefix) {
+            var isArray = $.isArray(object);
             for (var key in object) {
-                var postKey = isFinite(key)
-                    ? (prefix != "" ? prefix : "") + "[" + key + "]"
-                    : (prefix != "" ? prefix + "." : "") + key;
+                var postKey = '';
+                if (isArray || typeof key === 'number') {
+                    postKey = (prefix != '' ? prefix : '') + '[' + key + ']';
+                }
+                else {
+                    postKey = (prefix != '' ? prefix + '.' : '') + key;
+                }
                 switch (typeof (object[key])) {
                     case "number":
                     case "string":
@@ -279,7 +280,12 @@ String.prototype.padLeft = function (length, padChar) {
             isDisabled = true;
         }
         var controls = $(this);
-        controls = !controls.is(Higgs.disableElementSelect) ? controls.find(Higgs.disableElementSelect) : controls;
+        var isControl = controls.is(Higgs.disableElementSelect);
+        if (!isControl) {
+            var container = controls;
+            container.toggleClass('disabled', isDisabled);
+            controls = controls.find(Higgs.disableElementSelect);
+        }
         controls.prop('disabled', isDisabled);
         controls.toggleClass('disabled', isDisabled);
         controls.trigger(isDisabled ? 'disabled' : 'enabled');
@@ -306,7 +312,7 @@ String.prototype.padLeft = function (length, padChar) {
             }
             else if (x.is(':radio')) {
                 if (x.length == 1) {
-                    x = x.parents('form').find(':radio[name=' + x[0].name + ']');
+                    x = x.parents('form').find(':radio[name="' + x[0].name + '"]');
                 }
                 x.each(function () {
                     if (this.checked) {
@@ -339,7 +345,7 @@ String.prototype.padLeft = function (length, padChar) {
         };
         if (x.is(':radio')) {
             if (x.length == 1) {
-                x = x.parents('form').find(':radio[name=' + x[0].name + ']');
+                x = x.parents('form').find(':radio[name="' + x[0].name + '"]');
             }
             x.each(function () {
                 if (compareValue(this.value, value))
@@ -350,10 +356,7 @@ String.prototype.padLeft = function (length, padChar) {
             if (this[0].value && typeof value !== 'boolean') {
                 value = this[0].value === value;
             }
-            if (value)
-                x.attr('checked', 'on');
-            else
-                x.removeAttr('checked');
+            this.prop('checked', value);
         }
         else if (x.is('select')) {
             var selectedValue;
@@ -402,7 +405,7 @@ var Higgs;
             throw new Error('not implemented method');
         };
         return AbstructValidation;
-    })();
+    }());
     Higgs.AbstructValidation = AbstructValidation;
     var ValidationResult = (function () {
         function ValidationResult(validationRule, context, path, value) {
@@ -420,7 +423,7 @@ var Higgs;
             }
         }
         return ValidationResult;
-    })();
+    }());
     Higgs.ValidationResult = ValidationResult;
     var SerializeOptions = (function () {
         function SerializeOptions() {
@@ -428,32 +431,34 @@ var Higgs;
         }
         SerializeOptions.defaultValue = new SerializeOptions();
         return SerializeOptions;
-    })();
+    }());
     Higgs.SerializeOptions = SerializeOptions;
     var ValidateOptions = (function () {
         function ValidateOptions() {
-            this.cacheValidationObject = true;
+            // For dynamic form, don't cache
+            this.cacheValidationObject = false;
             this.ignoreValidation = false;
             this.stopOnFirstInvalid = true;
             this.enableFadeInFeedback = true;
         }
         ValidateOptions.defaultValue = new ValidateOptions();
         return ValidateOptions;
-    })();
+    }());
     Higgs.ValidateOptions = ValidateOptions;
     var ValidateContext = (function () {
-        function ValidateContext(parent, container) {
+        function ValidateContext(parent, container, elementName) {
             this.parent = parent;
             this.validationContainer = container;
+            this.elementName = elementName;
         }
         return ValidateContext;
-    })();
+    }());
     Higgs.ValidateContext = ValidateContext;
     var RuleData = (function () {
         function RuleData() {
         }
         return RuleData;
-    })();
+    }());
     Higgs.RuleData = RuleData;
     function isEmpty(value) {
         return value === undefined || value != null && value.constructor === String && value === '';
@@ -479,12 +484,12 @@ var Higgs;
             return $.extend(true, [], validationRules);
         }
         Rules.toArray = toArray;
-        function getElementValidation() {
-            return $.extend(true, [], validationRules.filter(function (x) { return !x.path; }));
+        function getElementValidation(allowedRules) {
+            return $.extend(true, [], validationRules.filter(function (x) { return !x.path && (!allowedRules || $.inArray(x.validation, allowedRules) >= 0); }));
         }
         Rules.getElementValidation = getElementValidation;
-        function getPropertyValidationData() {
-            return $.extend(true, [], validationRules.filter(function (x) { return !!x.path; }));
+        function getPropertyValidationData(allowedRules) {
+            return $.extend(true, [], validationRules.filter(function (x) { return !!x.path && (!allowedRules || $.inArray(x.validation, allowedRules) >= 0); }));
         }
         Rules.getPropertyValidationData = getPropertyValidationData;
     })(Rules = Higgs.Rules || (Higgs.Rules = {}));
@@ -502,12 +507,10 @@ var Higgs;
         if (arguments.length === 0 || options === false)
             return fn._serialize.apply(this);
         var settings = (typeof options === 'object' ? $.extend(true, {}, Higgs.SerializeOptions.defaultValue, options) : $.extend(true, {}, Higgs.SerializeOptions.defaultValue));
-        if (this.length === 1)
-            return serialize.call(this, settings);
-        var result = [];
-        $(this).each(function () {
+        var result = {};
+        this.each(function () {
             var model = serialize.call(this, settings);
-            result.push(model);
+            $.extend(result, model);
         });
         return result;
     };
@@ -590,23 +593,15 @@ var Higgs;
             }
         }
     }
-    fn.getValidationModel = function (modelData) {
+    fn.getValidationModel = function (modelData, options) {
         var x = $(this);
         var controls;
         var result = {};
-        if (modelData === undefined) {
-            modelData = x.serialize(true);
-        }
         // TODO: support multiple containers
-        if (x.is(':input')) {
-            controls = x;
-        }
-        else {
-            controls = $(':input', this);
-        }
+        controls = x.is(':input') ? x : $(':input', this);
         controls = controls.filter(':visible');
-        var elementValidations = Higgs.Rules.getElementValidation();
-        var propertyValidationDatas = Higgs.Rules.getPropertyValidationData();
+        var elementValidations = Higgs.Rules.getElementValidation(options.allowedRules);
+        var propertyValidationDatas = Higgs.Rules.getPropertyValidationData(options.allowedRules);
         // Get all element-based rules.
         controls
             .not('button')
@@ -656,26 +651,26 @@ var Higgs;
         orderRules(result);
         return result;
     };
-    fn.validateModel = function (options) {
+    fn.validateModel = function (options, formData) {
         var container = $(this);
         options = options || $.extend(true, {}, Higgs.ValidateOptions.defaultValue);
         options.validationContainer = container;
-        if (container.is('form') && (this.noValidate || options.ignoreValidation))
+        if (container.is('form') && (options.ignoreValidation))
             return true;
         if (options.validationModel)
             options.cacheValidationObject = false;
-        var obj = container.serialize(true);
-        container.data(validatedModelKey, obj);
+        formData = formData || container.serialize(true);
+        //container.data(validatedModelKey, obj);
         var validationModel;
         if (options.cacheValidationObject && !options.validationModel) {
             validationModel = container.data(validationModelKey);
             if (!validationModel) {
-                validationModel = container.getValidationModel(obj);
+                validationModel = container.getValidationModel(formData, options);
                 container.data(validationModelKey, validationModel);
             }
         }
         else {
-            validationModel = container.getValidationModel(obj);
+            validationModel = container.getValidationModel(formData, options);
         }
         if (options.validationModel) {
             for (var key in options.validationModel) {
@@ -703,7 +698,7 @@ var Higgs;
                 }
             }
         }
-        var result = fn.validateModel.test(validationModel, options, obj);
+        var result = fn.validateModel.test(validationModel, options, formData);
         return result;
     };
     fn.validateModel.test = function (validationModel, options, obj, path) {
@@ -714,7 +709,7 @@ var Higgs;
                 continue;
             var cPath = (path ? path + '.' : '') + name;
             if (validationModel[name] instanceof Higgs['ValidationRuleArray']) {
-                var context = new Higgs.ValidateContext(obj, options.validationContainer);
+                var context = new Higgs.ValidateContext(obj, options.validationContainer, name);
                 var value = obj[name];
                 var rules = validationModel[name];
                 for (var i = 0; i < rules.length; i++) {
@@ -737,9 +732,6 @@ var Higgs;
         $(this).data(validationModelKey, null);
         return this;
     };
-    fn.getValidatedModel = function () {
-        return $(this).data(validatedModelKey);
-    };
 })(jQuery.fn);
 //#endregion
 //#region Validation Rules
@@ -753,7 +745,7 @@ var Higgs;
                 this.value = undefined;
             }
             return FieldDependencyOption;
-        })();
+        }());
         Rules.FieldDependencyOption = FieldDependencyOption;
         ;
         var RequiredValidation = (function (_super) {
@@ -841,7 +833,8 @@ var Higgs;
                 return Higgs.locale.rules.requiredValidation.apply(this, arguments);
             };
             RequiredValidation.create = function (el, data) {
-                var required = data.required || $(el).attr('required');
+                // Beware: `data.required` doesn't work for dynamic element
+                var required = $(el).attr('required') || $(el).attr('data-required');
                 if (!required)
                     return null;
                 if (required === 'required')
@@ -849,7 +842,7 @@ var Higgs;
                 return new RequiredValidation(required);
             };
             return RequiredValidation;
-        })(Higgs.AbstructValidation);
+        }(Higgs.AbstructValidation));
         Rules.RequiredValidation = RequiredValidation;
         var StringLengthValidation = (function (_super) {
             __extends(StringLengthValidation, _super);
@@ -899,7 +892,7 @@ var Higgs;
                 return new StringLengthValidation(minLength, maxLength);
             };
             return StringLengthValidation;
-        })(Higgs.AbstructValidation);
+        }(Higgs.AbstructValidation));
         Rules.StringLengthValidation = StringLengthValidation;
         var PatternValidation = (function (_super) {
             __extends(PatternValidation, _super);
@@ -933,7 +926,7 @@ var Higgs;
                 return new PatternValidation(pattern);
             };
             return PatternValidation;
-        })(Higgs.AbstructValidation);
+        }(Higgs.AbstructValidation));
         Rules.PatternValidation = PatternValidation;
         var NumberValidation = (function (_super) {
             __extends(NumberValidation, _super);
@@ -960,7 +953,7 @@ var Higgs;
                 return validation;
             };
             return NumberValidation;
-        })(PatternValidation);
+        }(PatternValidation));
         Rules.NumberValidation = NumberValidation;
         var UrlValidation = (function (_super) {
             __extends(UrlValidation, _super);
@@ -1016,7 +1009,7 @@ var Higgs;
                 return validation;
             };
             return UrlValidation;
-        })(PatternValidation);
+        }(PatternValidation));
         Rules.UrlValidation = UrlValidation;
         var EmailValidation = (function (_super) {
             __extends(EmailValidation, _super);
@@ -1040,7 +1033,7 @@ var Higgs;
                 return validation;
             };
             return EmailValidation;
-        })(PatternValidation);
+        }(PatternValidation));
         Rules.EmailValidation = EmailValidation;
         var MoreThanValidation = (function (_super) {
             __extends(MoreThanValidation, _super);
@@ -1064,7 +1057,7 @@ var Higgs;
                 return validation;
             };
             return MoreThanValidation;
-        })(Higgs.AbstructValidation);
+        }(Higgs.AbstructValidation));
         Rules.MoreThanValidation = MoreThanValidation;
         var MinValidation = (function (_super) {
             __extends(MinValidation, _super);
@@ -1093,7 +1086,7 @@ var Higgs;
                 return validation;
             };
             return MinValidation;
-        })(Higgs.AbstructValidation);
+        }(Higgs.AbstructValidation));
         Rules.MinValidation = MinValidation;
         var LessThanValidation = (function (_super) {
             __extends(LessThanValidation, _super);
@@ -1117,7 +1110,7 @@ var Higgs;
                 return validation;
             };
             return LessThanValidation;
-        })(Higgs.AbstructValidation);
+        }(Higgs.AbstructValidation));
         Rules.LessThanValidation = LessThanValidation;
         var MaxValidation = (function (_super) {
             __extends(MaxValidation, _super);
@@ -1146,7 +1139,7 @@ var Higgs;
                 return validation;
             };
             return MaxValidation;
-        })(Higgs.AbstructValidation);
+        }(Higgs.AbstructValidation));
         Rules.MaxValidation = MaxValidation;
         var EqualValidation = (function (_super) {
             __extends(EqualValidation, _super);
@@ -1171,7 +1164,7 @@ var Higgs;
                 return new EqualValidation(propertyName);
             };
             return EqualValidation;
-        })(Higgs.AbstructValidation);
+        }(Higgs.AbstructValidation));
         Rules.EqualValidation = EqualValidation;
         var NotEqualValidation = (function (_super) {
             __extends(NotEqualValidation, _super);
@@ -1196,7 +1189,7 @@ var Higgs;
                 return new NotEqualValidation(propertyName);
             };
             return NotEqualValidation;
-        })(Higgs.AbstructValidation);
+        }(Higgs.AbstructValidation));
         Rules.NotEqualValidation = NotEqualValidation;
         // Auto register all validation
         for (var key in Higgs.Rules) {
@@ -1238,15 +1231,17 @@ var Higgs;
         var isValid = true;
         for (var i = 0; i < result.length; i++) {
             var cResult = result[i];
-            var input = inputs.filter('[name=' + cResult.path + ']:visible');
+            var input = inputs.filter('[name="' + cResult.path + '"]:visible');
             if (input.length === 0)
                 continue;
             isValid = false;
             var inputContainer = input.parents('[class^=col-]:first,.form-group:first').first();
             var feedback = input.nextAll('.form-control-feedback:eq(0)');
+            var label = $('label[for="' + cResult.path + '"]:eq(0)', container);
             inputContainer.addClass('has-error has-feedback');
-            if (feedback.length === 0) {
+            if (!feedback.length) {
                 feedback = $('<span class="glyphicon form-control-feedback"></span>');
+                feedback.css('top', label.length ? label.outerHeight(true) : 0);
                 var inputParent = input.parent();
                 if (inputParent.is('.input-group')) {
                     var inputGroup = inputParent;
@@ -1280,7 +1275,7 @@ var Higgs;
             // Convert to plug-in module
             input.off('*.validationResult.popover');
             if (input.is('.select2')) {
-                input.on('select2-focus.validationResult.popover', null, cResult, onFocusInvalidInput);
+                input.on('select2:opening.validationResult.popover', null, cResult, onFocusInvalidInput);
             }
             else {
                 input.on('focus.validationResult.popover', null, cResult, onFocusInvalidInput);

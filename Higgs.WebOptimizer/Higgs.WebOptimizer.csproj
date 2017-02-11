@@ -60,6 +60,7 @@
     <Compile Include="..\Higgs.Core\Helpers\IOHelpers.cs">
       <Link>IOHelpers.cs</Link>
     </Compile>
+    <Compile Include="DebugWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

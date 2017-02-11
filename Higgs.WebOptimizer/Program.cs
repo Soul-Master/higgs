@@ -11,11 +11,24 @@ namespace Higgs.WebOptimizer
     {
         static void Main(string[] args)
         {
-            //var projectDir = new DirectoryInfo(args[0]);
-            //var deployDir = new DirectoryInfo(args[1]);
-            var projectDir = new DirectoryInfo(@"I:\myProject\ChemInvent\ChemInvent");
-            var deployDir = new DirectoryInfo(@"D:\PackageTmp");
-            var viewPages = projectDir.GetFiles("*.cshtml", SearchOption.AllDirectories);
+#if DEBUG
+            Console.SetOut(new DebugWriter());
+            var projectDir = new DirectoryInfo(@"D:\OnlineApp2\OnlineApp2");
+            var deployDir = new DirectoryInfo(@"D:\OnlineApp2_Deploy");
+            if (deployDir.Exists) deployDir.Delete(true);
+            deployDir.Create();
+            DirectoryCopy(projectDir.FullName, deployDir.FullName, true);
+            DeleteDirectory(Path.Combine(deployDir.FullName, "bin"));
+            DeleteDirectory(Path.Combine(deployDir.FullName, ".bin"));
+            DeleteDirectory(Path.Combine(deployDir.FullName, "obj"));
+            DeleteDirectory(Path.Combine(deployDir.FullName, "Properties"));
+            DeleteFiles(deployDir.FullName, "ts,less");
+#else
+            var projectDir = new DirectoryInfo(args[0]);
+            var deployDir = new DirectoryInfo(args[1]);
+#endif
+            var viewDir = new DirectoryInfo(Path.Combine(projectDir.FullName, "Views"));
+            var viewPages = viewDir.GetFiles("*.cshtml", SearchOption.AllDirectories);
 
             MinifyJs(viewPages, deployDir.FullName);
             MinifyCss(viewPages, deployDir.FullName);
@@ -31,10 +44,78 @@ namespace Higgs.WebOptimizer
 
             MinifyFile(viewPages, workingDir, pattern, "js", (inputFiles, outputFile) =>
             {
-                var cmd = "uglifyjs " + inputFiles + " -o " + outputFile;
+                var cmd = "uglifyjs2 " + inputFiles + " -c warnings=false -m -o " + outputFile;
 
                 return ExecuteProcess(workingDir, cmd);
             });
+        }
+
+        static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+            DirectoryInfo[] dirs = dir.GetDirectories();
+
+            // If the source directory does not exist, throw an exception.
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            // If the destination directory does not exist, create it.
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+
+            // Get the file contents of the directory to copy.
+            FileInfo[] files = dir.GetFiles();
+
+            foreach (FileInfo file in files)
+            {
+                // Create the path to the new copy of the file.
+                string temppath = Path.Combine(destDirName, file.Name);
+
+                // Copy the file.
+                file.CopyTo(temppath, false);
+            }
+
+            // If copySubDirs is true, copy the subdirectories.
+            if (copySubDirs)
+            {
+
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    // Create the subdirectory.
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+
+                    // Copy the subdirectories.
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                }
+            }
+        }
+
+        static void DeleteDirectory(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
+        }
+
+        static void DeleteFiles(string path, string extension)
+        {
+            var extensions = extension.Split(',');
+            foreach (var f in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories))
+            {
+                var ext = Path.GetExtension(f);
+                if(ext.Length > 0 && extensions.Contains(ext.Substring(1)))
+                {
+                    File.Delete(f);
+                }
+            }
         }
 
         static void MinifyCss(IEnumerable<FileInfo> viewPages, string workingDir)
@@ -111,16 +192,23 @@ namespace Higgs.WebOptimizer
 
                         inputFileList.ForEach(File.Delete);
                     }
+                    else
+                    {
+                        Console.WriteLine("Error: " + outputFile);
+                    }
                 }
             }
-
+            
             // Minify all other files
             foreach (var filePath in Directory.GetFiles(workingDir, "*." + extension, SearchOption.AllDirectories))
             {
                 if (outputFiles.ContainsKey(filePath)) continue;
 
                 Console.WriteLine("- " + IOHelpers.GetRelativePath(workingDir, filePath));
-                minifyFn(filePath, filePath);
+                if (!minifyFn(filePath, filePath))
+                {
+                    Console.WriteLine("Error: " + filePath);
+                }
             }
         }
 
