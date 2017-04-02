@@ -79,7 +79,8 @@ namespace Higgs.Web.Helpers
             }
 
             // Order
-            if (model.Order != null)
+            var canOrder = model.Order != null && model.Order.Count > 0;
+            if (canOrder)
             {
                 var orderBy = string.Empty;
                 for (var i = 0; i < model.Order.Count; i++)
@@ -110,7 +111,15 @@ namespace Higgs.Web.Helpers
                 return fileStreamResult;
             }
 
-            var result = list.Skip(model.Start).Take(model.Length == -1 ? int.MaxValue : model.Length).ToList();
+            List<T> result;
+            if(canOrder)
+            {
+                result = list.Skip(model.Start).Take(model.Length == -1 ? int.MaxValue : model.Length).ToList();
+            }
+            else
+            {
+                result = list.ToList();
+            }
 
             if (resultCallback != null) resultCallback(result, recordsTotal);
 
@@ -219,7 +228,11 @@ namespace Higgs.Web.Helpers
 
                     var cellStyle = col.ExportDataType.ToCellFormat();
                     var cell = sheet.AddCell(row, cellStyle);
+                    if (string.IsNullOrEmpty(col.Data)) continue;
+
                     var colName = col.Data.ToUpperInvariant();
+                    if (!properties.ContainsKey(colName)) continue;
+
                     var prop = properties[colName];
                     var itemPropertyValue = prop.GetValue(item);
 
