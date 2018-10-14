@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Higgs.Core.Helpers;
 using Higgs.OpenXml;
 using Newtonsoft.Json;
 
@@ -112,7 +113,7 @@ namespace Higgs.Web.Helpers
             }
 
             List<T> result;
-            if(canOrder)
+            if (canOrder)
             {
                 result = list.Skip(model.Start).Take(model.Length == -1 ? int.MaxValue : model.Length).ToList();
             }
@@ -167,14 +168,25 @@ namespace Higgs.Web.Helpers
 
                 if (col.ExportColSpan == 1 && colSpan == 0)
                 {
-                    var cell1 = sheet.AddCell(header1, DefaultCellFormats.BoldCenterBorder);
-                    cell1.SetValueInlineString(col.ExportTitle ?? col.Name ?? col.Data);
-
-                    if (hasSubColumn)
+                    if (hasSubColumn && col.ExportGroupTitle != null)
                     {
-                        var cell2 = sheet.AddCell(header2, DefaultCellFormats.BoldCenterBorder);
+                        sheet.AddCell(header1, DefaultCellFormats.BoldCenterBorder)
+                                .SetValueInlineString(col.ExportGroupTitle);
 
-                        sheet.MergeCell(cell1, cell2);
+                        sheet.AddCell(header2, DefaultCellFormats.BoldCenterBorder)
+                                .SetValueInlineString(col.ExportTitle ?? col.Name ?? col.Data);
+                    }
+                    else
+                    {
+                        var cell1 = sheet.AddCell(header1, DefaultCellFormats.BoldCenterBorder);
+                        cell1.SetValueInlineString(col.ExportTitle ?? col.Name ?? col.Data);
+
+                        if (hasSubColumn)
+                        {
+                            var cell2 = sheet.AddCell(header2, DefaultCellFormats.BoldCenterBorder);
+
+                            sheet.MergeCell(cell1, cell2);
+                        }
                     }
                 }
                 else
@@ -214,6 +226,8 @@ namespace Higgs.Web.Helpers
             var properties = typeof(T).GetProperties()
                                                         .Where(x => x.CanRead)
                                                         .ToDictionary(x => x.Name.ToUpperInvariant(), x => x);
+            var lastRowValues = new Dictionary<int, LastRowData>();
+            var pendingMergeCell = new Dictionary<string, string>();
 
             foreach (var item in data)
             {
@@ -232,13 +246,47 @@ namespace Higgs.Web.Helpers
 
                     var colName = col.Data.ToUpperInvariant();
                     if (!properties.ContainsKey(colName)) continue;
-
+                    
                     var prop = properties[colName];
                     var itemPropertyValue = prop.GetValue(item);
 
                     cell.SetValue(itemPropertyValue, prop.PropertyType);
+
+                    if (col.ExportMergeData)
+                    {
+                        if(!lastRowValues.ContainsKey(i))
+                        {
+                            // First row
+                            lastRowValues[i] = new LastRowData
+                            {
+                                StartCell = cell,
+                                Value = itemPropertyValue
+                            };
+                            continue;
+                        }
+
+                        var lastValue = lastRowValues[i];
+                        if(Convert.Equals(lastRowValues[i].Value, itemPropertyValue))
+                        {
+                            // Same value
+                            pendingMergeCell[lastValue.StartCell.CellReference] = cell.CellReference;
+                            cell.Remove();
+                            cell = sheet.AddCell(row, cellStyle);
+                        }
+                        else
+                        {
+                            // Different value
+                            lastValue.StartCell = cell;
+                            lastValue.Value = itemPropertyValue;
+                        }
+                    }
                 }
             }
+
+            pendingMergeCell.ForEach(x =>
+            {
+                sheet.MergeCell(x.Key, x.Value);
+            });
 
             #endregion
 
@@ -267,7 +315,7 @@ namespace Higgs.Web.Helpers
                         footerCellIndex++;
                     }
 
-                    if(lastVisibleIndex.HasValue) footerMapping[lastVisibleIndex.Value] = i;
+                    if (lastVisibleIndex.HasValue) footerMapping[lastVisibleIndex.Value] = i;
                 }
 
                 for (var i = 0; i < model.Columns.Count; i++)
@@ -326,7 +374,7 @@ namespace Higgs.Web.Helpers
 
             return doc.Save();
         }
-        
+
         public static DefaultCellFormats ToCellFormat(this ExportDataType col)
         {
             DefaultCellFormats cellStyle;
@@ -402,7 +450,9 @@ namespace Higgs.Web.Helpers
         public int ExportColSpan { get; set; } = 1;
         public ExportDataType ExportDataType { get; set; }
         public bool IsVisible { get; set; } = true;
+        public bool ExportMergeData { get; set; } = false;
     }
+
     public class SearchModel
     {
         public string Value { get; set; }
@@ -472,5 +522,11 @@ namespace Higgs.Web.Helpers
             RecordsFiltered = recordsFiltered;
             RecordsTotal = recordsTotal;
         }
+    }
+
+    public class LastRowData
+    {
+        public Cell StartCell { get; set; }
+        public object Value { get; set; }
     }
 }
