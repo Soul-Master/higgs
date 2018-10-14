@@ -177,10 +177,10 @@ namespace Higgs.OpenXml
 
         public static OpenXmlPackage SetPackageProperties(this OpenXmlPackage document, string authorName)
         {
-            document.PackageProperties.Creator = "Author Name";
+            document.PackageProperties.Creator = authorName;
             document.PackageProperties.Created = DateTime.Now;
             document.PackageProperties.Modified = DateTime.Now;
-            document.PackageProperties.LastModifiedBy = "Author Name";
+            document.PackageProperties.LastModifiedBy = authorName;
 
             return document;
         }

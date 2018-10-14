@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\ExtensionPack\4.0\MSBuild.ExtensionPack.tasks"/>
+  <!-- Require MSBuildExtension 4.0.15.0 (x86) -->
+    <Import Project="C:\Program Files (x86)\MSBuildExtensionPack\4.0\MSBuild.ExtensionPack.tasks"/>
 
     <Target Name="AfterBuild">
         <!-- Copy all Linked file -->
@@ -23,6 +24,7 @@
 
         <Copy SourceFiles="$(OutDir)/Higgs.Core.dll" DestinationFolder="Packages/Higgs/lib/net40" />
         <Copy SourceFiles="$(ProjectDir)Packages\Higgs\Higgs.nuspec" DestinationFiles="$(ProjectDir)Packages\Higgs\Higgs.%(HiggsInfo.Version).nuspec" />
+        <Message Text="Update version in NuGet spec file $(ProjectDir)Packages\Higgs\Higgs.%(HiggsInfo.Version).nuspec with %(HiggsInfo.Version)" Importance="high" />
         <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="3\.0\.0\.0" Replacement="%(HiggsInfo.Version)"
                                                Files="$(ProjectDir)Packages\Higgs\Higgs.%(HiggsInfo.Version).nuspec"/>
         <Exec Command="NuGet.exe Pack &quot;$(ProjectDir)Packages\Higgs\Higgs.%(HiggsInfo.Version).nuspec&quot; -OutputDirectory &quot;$(ProjectDir)Packages&quot;"

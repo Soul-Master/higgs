@@ -13,7 +13,7 @@ namespace Higgs.Web.Helpers
         public static JsonNetResult ToSelect2Result<T>(this IEnumerable<T> list, Select2RequestModel model)
             where T : IKey
         {
-            var keywords = model.SearchTerm.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var keywords = (model.SearchTerm ?? string.Empty).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
             var temp =
             (
