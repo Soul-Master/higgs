@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
+using CsvHelper;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Higgs.Core.Helpers;
 using Higgs.OpenXml;
@@ -100,16 +102,10 @@ namespace Higgs.Web.Helpers
 
             var recordsFiltered = list.Count();
 
-            // Export as Excel
+            // Export as file
             if (model.IsExport)
             {
-                var excelStream = list.ToList().CreateExcelReport(model, exportFooter);
-                var fileStreamResult = new FileStreamResult(excelStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                {
-                    FileDownloadName = model.ReportTitle != null ? model.ReportTitle + ".xlsx" : "Export.xlsx"
-                };
-
-                return fileStreamResult;
+                return list.ToList().CreateReport<T>(model, exportFooter);
             }
 
             List<T> result;
@@ -130,6 +126,26 @@ namespace Higgs.Web.Helpers
                 {
                     AdditionalData = additionalData
                 }
+            };
+        }
+
+        public static ActionResult CreateReport<T>(this List<T> list, DataTablesRequestModel model, ExportFooter footer = null)
+            where T : class
+        {
+            if (model.ExportType == "csv")
+            {
+                var csvData = list.ToList().CreateCsvReport<T>(model);
+                return new FileStreamResult(new MemoryStream(csvData, false), "text/csv")
+                {
+                    FileDownloadName = model.ReportTitle != null ? model.ReportTitle + ".csv" : "Export.csv"
+                };
+            }
+
+            // excel
+            var excelStream = list.CreateExcelReport<T>(model, footer);
+            return new FileStreamResult(excelStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                FileDownloadName = model.ReportTitle != null ? model.ReportTitle + ".xlsx" : "Export.xlsx"
             };
         }
 
@@ -246,7 +262,7 @@ namespace Higgs.Web.Helpers
 
                     var colName = col.Data.ToUpperInvariant();
                     if (!properties.ContainsKey(colName)) continue;
-                    
+
                     var prop = properties[colName];
                     var itemPropertyValue = prop.GetValue(item);
 
@@ -254,7 +270,7 @@ namespace Higgs.Web.Helpers
 
                     if (col.ExportMergeData)
                     {
-                        if(!lastRowValues.ContainsKey(i))
+                        if (!lastRowValues.ContainsKey(i))
                         {
                             // First row
                             lastRowValues[i] = new LastRowData
@@ -266,7 +282,7 @@ namespace Higgs.Web.Helpers
                         }
 
                         var lastValue = lastRowValues[i];
-                        if(Convert.Equals(lastRowValues[i].Value, itemPropertyValue))
+                        if (Convert.Equals(lastRowValues[i].Value, itemPropertyValue))
                         {
                             // Same value
                             pendingMergeCell[lastValue.StartCell.CellReference] = cell.CellReference;
@@ -375,6 +391,22 @@ namespace Higgs.Web.Helpers
             return doc.Save();
         }
 
+        public static byte[] CreateCsvReport<T>(this List<T> data, DataTablesRequestModel model)
+        {
+            using (var mem = new MemoryStream())
+            using (var writer = new StreamWriter(mem, Encoding.UTF8))
+            using (var csv = new HiggsCsvWriter(writer, model))
+            {
+                csv.Configuration.SanitizeForInjection = false;
+                csv.Configuration.AutoMap<T>();
+                csv.WriteRecords(data);
+
+                writer.Flush();
+
+                return mem.ToArray();
+            }
+        }
+
         public static DefaultCellFormats ToCellFormat(this ExportDataType col)
         {
             DefaultCellFormats cellStyle;
@@ -420,6 +452,7 @@ namespace Higgs.Web.Helpers
 
         // For export only
         public bool IsExport { get; set; }
+        public string ExportType { get; set; }
         public string ReportTitle { get; set; }
     }
 
@@ -528,5 +561,110 @@ namespace Higgs.Web.Helpers
     {
         public Cell StartCell { get; set; }
         public object Value { get; set; }
+    }
+
+    public class HiggsCsvWriter : CsvWriter
+    {
+        private readonly DataTablesRequestModel model;
+
+        public HiggsCsvWriter(TextWriter writer, DataTablesRequestModel model) : base(writer)
+        {
+            this.model = model;
+        }
+
+        public override void WriteHeader(Type type)
+        {
+            var colSpan = 0;
+            var hasSubColumn = model.Columns.Any(x => x.ExportColSpan > 1);
+
+            for (var i = 0; i < model.Columns.Count; i++)
+            {
+                var col = model.Columns[i];
+
+                if (!col.IsVisible) continue;
+
+                if (col.ExportColSpan == 1 && colSpan == 0)
+                {
+                    if (hasSubColumn && col.ExportGroupTitle != null)
+                    {
+                        WriteField(col.ExportTitle ?? col.Name ?? col.Data);
+                    }
+                    else
+                    {
+                        WriteField(col.ExportTitle ?? col.Name ?? col.Data);
+                    }
+                }
+                else
+                {
+                    if (col.ExportColSpan > 1)
+                    {
+                        colSpan = col.ExportColSpan;
+                    }
+
+                    WriteField(col.ExportTitle);
+
+                    colSpan--;
+                }
+            }
+        }
+
+        public override void WriteRecords<T>(IEnumerable<T> records)
+        {
+            var type = typeof(T);
+            var properties = type.GetProperties()
+                                                        .Where(x => x.CanRead)
+                                                        .ToDictionary(x => x.Name.ToUpperInvariant(), x => x);
+            var lastRowValues = new Dictionary<int, LastRowData>();
+            var pendingMergeCell = new Dictionary<string, string>();
+
+            WriteHeader(type);
+            NextRecord();
+
+            foreach (var item in records)
+            {
+                for (var i = 0; i < model.Columns.Count; i++)
+                {
+                    var col = model.Columns[i];
+
+                    // TODO: Test with colspan
+                    if (!col.IsVisible) continue;
+
+                    var cellStyle = col.ExportDataType.ToCellFormat();
+                    if (string.IsNullOrEmpty(col.Data))
+                    {
+                        WriteField(string.Empty);
+                        continue;
+                    }
+
+                    var colName = col.Data.ToUpperInvariant();
+                    if (!properties.ContainsKey(colName)) continue;
+
+                    var prop = properties[colName];
+                    var itemPropertyValue = prop.GetValue(item);
+                    string valueString = string.Empty;
+
+                    try
+                    {
+                        if (col.ExportDataType == ExportDataType.Date)
+                        {
+                            valueString = ((DateTime)itemPropertyValue).ToShortDateString();
+                        }
+                        else if (col.ExportDataType == ExportDataType.DateTime)
+                        {
+                            valueString = ((DateTime)itemPropertyValue).ToShortTimeString();
+                        }
+                        else
+                        {
+                            valueString = itemPropertyValue.ToString();
+                        }
+                    }
+                    catch { }
+
+                    WriteField(valueString);
+                }
+
+                NextRecord();
+            }
+        }
     }
 }
