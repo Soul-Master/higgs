@@ -13,8 +13,8 @@ namespace Higgs.WebOptimizer
         {
 #if DEBUG
             Console.SetOut(new DebugWriter());
-            var projectDir = new DirectoryInfo(@"D:\OnlineApp2\OnlineApp2");
-            var deployDir = new DirectoryInfo(@"D:\OnlineApp2_Deploy");
+            var projectDir = new DirectoryInfo(@"D:\CBSPayment\CBSPayment");
+            var deployDir = new DirectoryInfo(@"D:\CBSPayment.Deploy");
             if (deployDir.Exists) deployDir.Delete(true);
             deployDir.Create();
             DirectoryCopy(projectDir.FullName, deployDir.FullName, true);
@@ -44,7 +44,7 @@ namespace Higgs.WebOptimizer
 
             MinifyFile(viewPages, workingDir, pattern, "js", (inputFiles, outputFile) =>
             {
-                var cmd = "uglifyjs2 " + inputFiles + " -c warnings=false -m -o " + outputFile;
+                var cmd = "terser " + inputFiles + " --compress warnings=false --mangle --output " + outputFile;
 
                 return ExecuteProcess(workingDir, cmd);
             });
